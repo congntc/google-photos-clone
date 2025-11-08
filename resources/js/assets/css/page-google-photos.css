@@ -1,0 +1,425 @@
+
+      .photos-page-container {
+        position: fixed;
+        top: 64px;              /* Below navbar */
+        left: 260px;            /* Right of sidebar */
+        right: 0;               /* Full width to right edge */
+        bottom: 0;              /* Full height to bottom */
+        overflow-y: auto;       /* Scrollable content */
+        overflow-x: hidden;
+        padding: 24px;
+        padding-top: 0;         /* Remove top padding to make room for toolbar */
+        background: #f7f8fb;
+      }
+
+      /* Selection Toolbar - positioned within photos-page-container */
+      .selection-toolbar {
+        position: sticky;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 64px;
+        background: #1a73e8;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 24px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        z-index: 500; /* Above archive-header (z-index:50) */
+        margin: 0 -24px 24px -24px;  /* Extend to full width of container */
+        
+      }
+
+      .toolbar-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .toolbar-close {
+        background: transparent;
+        border: none;
+        color: #fff;
+        font-size: 24px;
+        cursor: pointer;
+        padding: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        transition: background 0.2s;
+      }
+
+      .toolbar-close:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .selection-count {
+        color: #fff;
+        font-size: 20px;
+        font-weight: 400;
+      }
+
+      .toolbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .toolbar-btn {
+        background: transparent;
+        border: none;
+        color: #fff;
+        font-size: 20px;
+        cursor: pointer;
+        padding: 8px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        height: 40px;
+        border-radius: 4px;
+        transition: background 0.2s;
+        white-space: nowrap;
+      }
+
+      .toolbar-btn span {
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      .toolbar-btn i {
+        font-size: 20px;
+      }
+
+      .toolbar-btn:hover {
+        background: rgba(255, 255, 255, 0.15);
+      }
+
+      /* Photo Grid - Using flexbox for dynamic width based on aspect ratio */
+      .photo-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: flex-start;
+        /* padding-top: 18px;  Add top padding when toolbar is not shown */
+      }
+
+      /* Remove top padding when toolbar is visible */
+      .has-selection-toolbar .photo-grid {
+        padding-top: 0;
+      }
+
+  .photo-item { 
+    position: relative; 
+    cursor: pointer; 
+    overflow: hidden; 
+    border-radius: 12px; 
+    background: transparent; 
+    border: none; 
+    transition: transform .15s, box-shadow .15s;
+    height: 180px;  
+    flex-shrink: 0;  
+  }
+  .photo-item:hover { transform:scale(1.01); box-shadow:0 10px 24px rgba(0,0,0,.08); z-index:10; }
+
+      .photo-item img {
+        width: auto;  
+        height: 100%;  
+        display: block;
+        object-fit: contain;  
+      }
+
+      .photo-item video {
+        width: auto;
+        height: 100%;
+        display: block;
+        object-fit: contain;
+        background: #000;
+      }
+
+      /* Section header like "Hôm qua", "Th 6, 31 thg 10" */
+      .date-divider {
+        width: 100%; 
+        flex-basis: 100%; 
+        /* padding: 10px 0 6px 0; */
+        font-size: 16px;
+        font-weight: 600;
+        color: #202124;
+        margin: 0;
+        letter-spacing: .2px;
+        text-align: left;
+        padding-left: 0;
+      }
+
+      /* Loading More Indicator */
+      .loading-more {
+        width: 100%;  /* Full width for flexbox layout */
+        flex-basis: 100%;  /* Take full row */
+        text-align: center;
+        padding: 24px;
+        color: #6a6f85;
+        font-size: 14px;
+      }
+
+      /* Floating Action Button */
+      .fab {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        width: 56px;
+        height: 56px;
+        border-radius: 28px;
+        background-color: #1a73e8;
+        border: none;
+        color: #fff;
+        font-size: 24px;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(26, 115, 232, 0.4);
+        transition: all 0.3s;
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+      }
+
+
+      .fab:hover {
+        background-color: #1557b0;
+        transform: scale(1.1);
+        box-shadow: 0 6px 16px rgba(26, 115, 232, 0.6);
+      }
+
+      /* Info Badge on Photo */
+  .photo-info{ position:absolute; inset:0; background:linear-gradient(to bottom, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.0) 60%, rgba(0,0,0,0.35) 100%); opacity:0; transition:opacity .15s; }
+      .photo-item:hover .photo-info{ opacity:1; }
+  
+  /* Show photo-info when any photo is selected (to show buttons) */
+  .has-selection-toolbar .photo-info {
+    opacity: 1;
+  }
+  
+  /* Hide per-photo date badge by default to match Google Photos */
+  .photo-date{ position:absolute; bottom:6px; left:12px; font-size:12px; color:#fff; padding:4px 8px; border-radius:6px; border:none; display:none; }
+  .photo-item:hover .photo-date{ display:block; }
+  
+  /* Photo Select Checkbox (Left side) */
+  .photo-select{ 
+    position:absolute; 
+    top:8px; 
+    left:8px; 
+    width:32px; 
+    height:32px; 
+    border-radius:16px; 
+    background:#ffffff; 
+    border:1px solid #e5e7ee; 
+    display:flex; 
+    align-items:center; 
+    justify-content:center; 
+    color:#666; 
+    cursor:pointer;
+    transition: all 0.2s;
+    opacity: 0;
+  }
+  .photo-item:hover .photo-select,
+  .photo-select.visible {
+    opacity: 1;
+  }
+  .photo-select:hover{ background:#eef2ff; color:#1a73e8; }
+  .photo-select.active{ background:#1a73e8; color:#fff; border-color:#1a73e8; opacity:1; }
+  /* When selection mode is active, keep checkboxes visible for all items */
+  .has-selection-toolbar .photo-select { opacity: 1; }
+  
+  /* Video Duration Overlay */
+  .video-duration {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 2px 6px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+  }
+
+  /* Always-visible top-left overlay for videos */
+  .video-duration-overlay {
+    position: absolute;
+    top: 8px;
+    right: 8px; /* Moved to top-right */
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 4px;
+    line-height: 1;
+    pointer-events: none;
+    z-index: 2;
+  }
+  
+  /* Photo Favorite (Right side) */
+  .photo-favorite{ position:absolute; top:8px; right:8px; width:32px; height:32px; border-radius:16px; background:#ffffff; border:1px solid #e5e7ee; display:flex; align-items:center; justify-content:center; color:#666; }
+  .photo-favorite:hover{ background:#eef2ff; color:#1a73e8; }
+  .photo-favorite.active{ background:#1a73e8; color:#fff; border-color:#1a73e8; }
+
+      /* Empty State */
+      .empty-state {
+        /* text-align: center; */
+        padding: 80px 20px;
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      .empty-state i {
+        font-size: 64px;
+        margin-bottom: 24px;
+        opacity: 0.3;
+      }
+
+      .empty-state h3 {
+        font-size: 24px;
+        font-weight: 400;
+        margin-bottom: 8px;
+      }
+
+      .empty-state p {
+        font-size: 16px;
+      }
+
+      /* Lightbox Overlay */
+      .lightbox-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: #000;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* Lightbox Top Bar */
+      .lightbox-topbar {
+        height: 64px;
+        background: rgba(0, 0, 0, 0.95);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 16px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .lightbox-topbar-left,
+      .lightbox-topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .lightbox-counter {
+        color: #fff;
+        font-size: 14px;
+        margin-left: 8px;
+      }
+
+      .zoom-level {
+        color: #fff;
+        font-size: 14px;
+        min-width: 50px;
+        text-align: center;
+      }
+
+      .lightbox-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: transparent;
+        border: none;
+        color: #fff;
+        font-size: 20px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+      }
+
+      .lightbox-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .lightbox-btn-favorite:hover {
+        color: #ff6b6b;
+      }
+
+      .lightbox-btn-delete {
+        background: #dc3545;
+        margin-left: 8px;
+      }
+
+      .lightbox-btn-delete:hover {
+        background: #c82333;
+      }
+
+      /* Lightbox Content */
+      .lightbox-content {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: auto;
+        padding: 20px;
+      }
+
+      .lightbox-content img {
+        cursor: grab;
+      }
+
+      .lightbox-content img:active {
+        cursor: grabbing;
+      }
+
+      /* Navigation Arrows */
+      .lightbox-nav {
+        position: fixed;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        color: #fff;
+        font-size: 32px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s, transform 0.2s;
+        z-index: 10000;
+      }
+
+      .lightbox-nav:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-50%) scale(1.1);
+      }
+
+      .lightbox-nav-prev {
+        left: 20px;
+      }
+
+      .lightbox-nav-next {
+        right: 20px;
+      }
+
+  
+
+
+ 

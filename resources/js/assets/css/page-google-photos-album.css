@@ -1,0 +1,231 @@
+
+/* Google Photos - Albums page styles */
+
+.album-page-container {
+  position: fixed;
+  top: 64px;              /* Below navbar */
+  left: 260px;            /* Right of sidebar */
+  right: 0;               /* Full width to right edge */
+  bottom: 0;              /* Full height to bottom */
+  overflow-y: auto;       /* Scrollable content */
+  overflow-x: hidden;
+  padding: 24px;
+  background: #f7f8fb;
+}
+
+/* Header bar */
+.albums-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0 12px 0;
+  margin-bottom: 4px;
+  border-bottom: 1px solid #e0e3e7;
+}
+
+.albums-title {
+  font-size: 28px;
+  font-weight: 500;
+  color: #202124;
+}
+
+.albums-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.albums-actions .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  border-radius: 18px;
+  border: 1px solid #dadce0;
+  background: #fff;
+  padding: 0 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #3c4043;
+  cursor: pointer;
+  transition: background .15s ease, box-shadow .15s ease;
+}
+
+.albums-actions .btn i {
+  font-size: 18px;
+}
+
+.albums-actions .btn:hover {
+  background: #f1f3f4;
+}
+
+.albums-actions .btn-create {
+  color: #1a73e8;
+  border-color: #d2e3fc;
+  background: #e8f0fe;
+}
+.albums-actions .btn-create:hover {
+  background: #d2e3fc;
+}
+
+.albums-actions .btn-sort i {
+  color: #5f6368;
+}
+
+.album-filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.album-filters .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: #f1f3f4;
+  border: 1px solid transparent;
+  color: #3c4043;
+  font-size: 13px;
+  line-height: 32px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background .15s ease;
+}
+
+.album-filters .chip i {
+  font-size: 15px;
+}
+
+.album-filters .chip:hover {
+  background: #e4e7e9;
+}
+
+.album-filters .chip.active {
+  background: #e8f0fe;
+  color: #1a73e8;
+  border-color: #d2e3fc;
+}
+
+.album-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill,minmax(240px,1fr));
+  gap: 28px;
+  padding-top: 8px;
+}
+
+.album-card {
+  user-select: none;
+  position: relative; /* for absolute-positioned popup menu */
+}
+
+.album-thumb {
+  position: relative;
+  width: 100%;
+  padding-top: 66.6667%; /* 3:2 ratio */
+  overflow: hidden;
+  border-radius: 16px;
+  background: #000;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+}
+
+.album-thumb img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .2s ease, filter .2s ease;
+  filter: saturate(0.96) contrast(1.02);
+}
+
+.album-card:hover .album-thumb img {
+  transform: scale(1.025);
+  filter: saturate(1.04) contrast(1.07);
+}
+
+.album-menu {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  background-color: rgba(0,0,0,0.35);
+  border: none;
+  justify-content: center;
+  border-radius: 50%;
+  color: #fff;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity .15s ease, transform .15s ease, background .15s ease;
+  backdrop-filter: blur(2px);
+}
+
+.album-card:hover .album-menu,
+.album-menu:focus-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.album-menu:hover {
+  background: rgba(0,0,0,0.55);
+}
+
+/* Popup menu */
+.album-popup-menu {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  min-width: 180px;
+  max-width: 260px;
+  background: #f7f8fb;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+  padding: 8px 0;
+  z-index: 1000;
+  border: 1px solid #e0e3e7;
+}
+
+.album-popup-menu .menu-item {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #202124;
+  cursor: pointer;
+}
+
+.album-popup-menu .menu-item:hover,
+.album-popup-menu .menu-item:focus-visible {
+  background: #e8f0fe;
+}
+
+
+.album-info {
+  margin-top: 12px;
+  text-align: left;
+  padding-left: 2px;
+}
+
+.album-title {
+  font-size: 15px;
+  line-height: 21px;
+  color: #202124;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  letter-spacing: .2px;
+}
+
+.album-meta {
+  margin-top: 3px;
+  font-size: 12px;
+  color: #5f6368;
+}

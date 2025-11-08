@@ -1,0 +1,237 @@
+* {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #fff;
+      color: #202124;
+      overflow-x: hidden;
+    }
+
+    /* ===== NAVIGATION ===== */
+    .nav-screenshots {
+      position: sticky;
+      top: 0;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 24px;
+      background-color: #fff;
+      border-bottom: 1px solid #dadce0;
+      z-index: 100;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .nav-screenshots.scrolled {
+      background-color: #f1f3f4; /* Xanh nhạt khi cuộn */
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .nav-back i, .nav-img i {
+      font-size: 20px;
+      color: #5f6368;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .nav-back i:hover, .nav-img i:hover {
+      color: #202124;
+    }
+
+    /* ===== HEADER ===== */
+    .screenshot-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      padding: 48px 64px 0 64px;
+      transition: padding 0.3s ease;
+    }
+
+    .screenshot-title-section {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .screenshot-title-section h1 {
+      font-size: 52px;
+      font-weight: 400;
+      margin-bottom: 12px;
+      letter-spacing: -0.3px;
+      transition: font-size 0.3s ease;
+    }
+
+    .album-label {
+      display: inline-block;
+      background: #e8eaed;
+      color: #5f6368;
+      font-size: 14px;
+      padding: 4px 10px;
+      border-radius: 8px;
+    }
+
+    .auto-archive {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    /* ===== Toggle ===== */
+    .toggle-btn {
+      position: relative;
+      width: 48px;
+      height: 26px;
+      background-color: #e0e0e0;
+      border: 2px solid #9e9e9e;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: background-color 0.3s, border-color 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 2px;
+    }
+
+    .toggle-circle {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background-color: #5f6368;
+      color: white;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s, background-color 0.3s;
+    }
+
+    .toggle-btn.active {
+      background-color: #c2e7ff;
+      border-color: #1a73e8;
+      justify-content: flex-end;
+    }
+
+    .toggle-btn.active .toggle-circle {
+      background-color: #1a73e8;
+    }
+
+    .toggle-text {
+      font-size: 15px;
+      color: #3c4043;
+    }
+
+    /* ===== GALLERY ===== */
+    .gallery-wrapper {
+      margin-top: 40px;
+      padding: 0 64px 64px 64px;
+      transition: padding 0.3s ease;
+    }
+
+    .screenshot-gallery {
+      display: flex;
+      gap: 28px;
+      overflow-x: auto;
+      scrollbar-width: thin;
+      padding-bottom: 16px;
+    }
+
+    .date-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .date-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: #3c4043;
+      margin-left: 4px;
+    }
+
+    .photo-row {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .photo-row img {
+      border-radius: 8px;
+      height: 180px;
+      width: auto;
+      object-fit: cover;
+      cursor: pointer;
+      transition: transform 0.25s, box-shadow 0.25s;
+    }
+
+    .photo-row img:hover {
+      transform: scale(1.05);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .screenshot-header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 32px 24px 0;
+      }
+      .gallery-wrapper {
+        padding: 0 24px;
+      }
+      .screenshot-title-section h1 {
+        font-size: 36px;
+      }
+    }
+    
+    /* Thêm hiệu ứng cho tiêu đề khi cuộn */
+    .header-compact {
+      padding-top: 24px !important;
+    }
+    
+    .header-compact h1 {
+      font-size: 36px !important;
+    }
+    
+    /* Hiệu ứng cho ảnh khi click */
+    .photo-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    
+    .photo-modal.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+    
+    .photo-modal img {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 8px;
+    }
+    
+    .close-modal {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      color: white;
+      font-size: 30px;
+      cursor: pointer;
+    }

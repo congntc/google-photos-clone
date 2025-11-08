@@ -1,0 +1,51 @@
+
+
+/* 2. Header của trang (Kho lưu trữ + Thêm ảnh) */
+.archive-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 16px 24px;
+    background: #f7f8fb;
+    position: sticky;
+    top: 0;
+    z-index: 50; /* Below .selection-toolbar (z-index:500) */
+    margin-bottom: 16px;
+}
+
+/* When selection toolbar is visible, ensure header doesn't capture clicks under the overlay */
+.has-selection-toolbar .archive-header {
+    pointer-events: none;
+}
+
+/* Ghi đè CSS .page-header cũ (nếu có) */
+.archive-header .page-header {
+    font-size: 22px;
+    font-weight: 500; /* Font weight giống Google Photos */
+    color: #202124;
+    margin: 0; 
+}
+
+.add-photos-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #1a73e8; /* Màu xanh Google */
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 8px 16px;
+    border-radius: 20px; /* Bo tròn */
+    transition: background-color 0.2s ease;
+}
+
+.add-photos-btn:hover {
+    background-color: rgba(26, 115, 232, 0.08); /* Màu nền xanh nhạt khi hover */
+}
+
+.add-photos-btn i {
+    font-size: 20px;
+}
+
+

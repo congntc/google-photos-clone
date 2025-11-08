@@ -1,0 +1,53 @@
+# Dependencies
+node_modules
+vendor
+
+# Environment files
+.env
+.env.backup
+.env.production
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Laravel specific
+storage/logs/*
+!storage/logs/.gitkeep
+storage/framework/cache/*
+!storage/framework/cache/.gitkeep
+storage/framework/sessions/*
+!storage/framework/sessions/.gitkeep
+storage/framework/views/*
+!storage/framework/views/.gitkeep
+bootstrap/cache/*
+!bootstrap/cache/.gitkeep
+
+# Testing
+.phpunit.result.cache
+tests/_output/*
+
+# Build artifacts
+public/hot
+public/storage
+public/build
+
+# Documentation
+*.md
+!README.md
+
+# Misc
+npm-debug.log
+yarn-error.log

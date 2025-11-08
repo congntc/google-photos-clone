@@ -1,0 +1,532 @@
+* {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html, body, #root {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;  /* Prevent body scroll, main-content will handle it */
+      }
+
+      body { 
+        background: #f7f8fb; 
+        color: #222; 
+        font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      }
+
+      /* Top Navigation Bar */
+      .top-navbar { position:fixed; top:0; left:0; right:0; height:64px; background:#f1f3f6; border-bottom:1px solid #e5e7ee; z-index:1000; display:flex; align-items:center; justify-content:space-between; padding:0 16px; }
+
+      .navbar-brand {
+        display: flex;
+        align-items: center;
+        font-size: 22px;
+        font-weight: 500;
+        color: #1c1d1d;
+        text-decoration: none;
+        gap: 12px;
+      }
+
+      .navbar-brand .google-wordmark {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        font-weight: 700;
+        letter-spacing: 0.2px;
+      }
+      .google-g { color: #4285F4; }
+      .google-o1 { color: #EA4335; }
+      .google-o2 { color: #FBBC05; }
+      .google-g2 { color: #4285F4; }
+      .google-l { color: #34A853; }
+      .google-e { color: #EA4335; }
+      .brand-photos { opacity: 0.9; font-weight: 500; }
+
+      .navbar-search {
+        flex: 1;
+        max-width: 720px;
+        margin: 0 48px;
+        position: relative;
+      }
+
+      .search-input-wrapper {
+        position: relative;
+      }
+
+      .search-input { width:100%; height:44px; background:#fff; border:1px solid #d7dbe8; border-radius:22px; padding:0 48px 0 56px; color:#1f1f1f; font-size:15px; }
+      .search-input:focus { outline:none; border-color:#c6cae2; box-shadow:0 1px 0 rgba(0,0,0,.02); }
+      .search-input::placeholder { color:#6a6f85; }
+
+      .search-icon { position:absolute; left:20px; top:50%; transform:translateY(-50%); font-size:18px; color:#6a6f85; }
+
+      .navbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .navbar-action-btn { 
+        width: 36px; 
+        height: 36px; 
+        border-radius: 18px; 
+        background: transparent; 
+        border: none; 
+        color: #333; 
+        font-size: 18px; 
+        cursor: pointer; 
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+      }
+      .navbar-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 18px;
+        background-color: #1a73e8;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .navbar-action-btn:hover{ background:#e8ebf4; }
+
+      /* Left Sidebar */
+      .left-sidebar { position:fixed; left:0; top:64px; width:260px; height:calc(100vh - 64px); background:#f7f8fb; border-right:1px solid #e5e7ee; padding:8px 0; overflow:auto; z-index:999; }
+
+      .sidebar-menu {
+        list-style: none;
+        padding: 0;
+      }
+
+      .sidebar-menu li {
+        margin: 4px 0;
+      }
+      .left-sidebar-title {
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      .sidebar-menu a{ display:flex; align-items:center; gap:14px; padding:10px 18px; text-decoration:none; color:#1f1f1f; border-radius:12px; margin:4px 12px; }
+      .sidebar-menu a:hover{ background:#eef2ff; }
+      .sidebar-menu i{ font-size:26px; width:24px;  color: #1c1d1d;}
+      .sidebar-menu .active{ background:#e7f0ff; color:#1a73e8; }
+
+      .sidebar-section-title { margin:16px 24px 8px 24px; font-size:12px; color:#7a7f92; text-transform:uppercase; letter-spacing:.6px; padding-right: 100px;}
+
+      .sidebar-storage { margin:16px; padding:12px; border:1px solid #e5e7ee; border-radius:12px; background:#fff; }
+      .storage-bar { width:100%; height:6px; border-radius:3px; background:#edf0f7; overflow:hidden; margin:8px 0 6px 0; }
+      .storage-bar > span {
+        display: block;
+        height: 100%;
+        width: 48%;
+        background: linear-gradient(90deg, #34A853, #1a73e8);
+      }
+      .btn-try { display:inline-block; margin-top:8px; border:1px solid #d6d9e6; padding:6px 10px; border-radius:16px; font-size:12px; text-decoration:none; color:#1f1f1f; background:#fff; }
+
+      
+            /* === CSS CHO MENU "TẠO" DROPDOWN === */
+
+.create-dropdown-menu {
+    position: absolute; /* Định vị tuyệt đối */
+    top: 56px;      /* Ngay dưới thanh navbar (64px - 8px padding) */
+    right: 120px;   /* Căn lề phải (bạn có thể cần chỉnh số này) */
+                    /* Vị trí này dựa trên vị trí của nút "+" */
+    
+    width: 320px;   /* Chiều rộng của menu */
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1001;  /* Nằm đè lên trên mọi thứ */
+    padding: 8px 0; /* Padding trên và dưới cho toàn menu */
+
+    /* Mặc định ẩn đi */
+    display: none;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.1s ease-out, transform 0.1s ease-out;
+}
+
+/* Lớp 'show' để hiện menu (dùng với JavaScript) */
+.create-dropdown-menu.show {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Tiêu đề "Tạo" */
+.dropdown-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: #202124;
+    padding: 8px 16px 12px 16px;
+    margin: 0;
+}
+
+/* Danh sách <ul> */
+.dropdown-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Các mục <li> bên trong */
+.dropdown-list li a {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 8px 16px;
+    text-decoration: none;
+    color: #3c4043;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.dropdown-list li a:hover {
+    background-color: #f1f3f4; /* Màu nền khi hover */
+}
+
+/* Icon bên trong mục <a> */
+.dropdown-list li a > i {
+    font-size: 20px;
+    color: #5f6368;
+    width: 24px;
+    text-align: center;
+}
+
+/* Đường kẻ ngang */
+.dropdown-divider {
+    border: none;
+    border-top: 1px solid #e0e0e0;
+    margin: 8px 0;
+}
+
+/* CSS cho mục có 2 dòng (Sao lưu thư mục) */
+.menu-item-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.4;
+}
+.sub-label {
+    font-size: 12px;
+    color: #5f6368;
+}
+
+/* CSS cho mục có mũi tên (Từ những nơi khác) */
+.has-submenu {
+    justify-content: space-between; /* Đẩy mũi tên qua phải */
+}
+.menu-item-main {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+.has-submenu .ri-arrow-right-s-line {
+    color: #5f6368;
+    font-size: 20px;
+}
+
+/* === CSS CHO PANEL TRỢ GIÚP (BÊN PHẢI) === */
+
+.help-panel {
+    position: fixed;
+    top: 64px; /* Dưới thanh navbar */
+    right: 0;
+    width: 360px; /* Chiều rộng của panel */
+    height: calc(100vh - 64px); /* Cao hết phần còn lại */
+    
+    background-color: #fff;
+    border-left: 1px solid #e0e0e0;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+    
+    z-index: 1002; /* Nằm trên menu "Tạo" */
+    
+    display: flex;
+    flex-direction: column;
+
+    /* Mặc định ẩn (trượt ra ngoài) */
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Lớp 'show' để hiện panel */
+.help-panel.show {
+    transform: translateX(0);
+}
+
+/* Header (Tiêu đề + nút X) */
+.help-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-bottom: 1px solid #e0e0e0;
+    flex-shrink: 0; /* Không co lại */
+}
+
+.help-title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 500;
+    color: #202124;
+}
+
+.help-close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #5f6368;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    line-height: 1;
+}
+.help-close-btn:hover {
+    background-color: #f1f3f4;
+}
+
+/* Thân panel (cuộn được) */
+.help-body {
+    flex: 1; /* Lấp đầy không gian còn lại */
+    overflow-y: auto;
+    padding: 16px 0;
+}
+
+/* Danh sách các mục */
+.help-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.help-list li a {
+    display: flex;
+    align-items: center;
+    gap: 20px; /* Khoảng cách icon và chữ */
+    padding: 12px 24px;
+    text-decoration: none;
+    color: #3c4043;
+    font-size: 14px;
+    cursor: pointer;
+}
+.help-list li a:hover {
+    background-color: #f1f3f4;
+}
+
+/* Icon trong danh sách */
+.help-list li a > i {
+    font-size: 20px;
+    color: #5f6368;
+    width: 24px;
+    text-align: center;
+}
+
+/* Cho mục "Truy cập diễn đàn..." */
+.help-list li a.link-only {
+    /* (24px icon + 20px gap) - 4px điều chỉnh */
+    padding-left: 64px; 
+    justify-content: space-between;
+}
+.help-list li a.link-only i {
+    font-size: 16px;
+    width: auto;
+}
+
+
+/* Thanh tìm kiếm */
+.help-search-wrapper {
+    position: relative;
+    margin: 16px 24px;
+}
+
+.help-search-input {
+    width: 100%;
+    height: 48px;
+    border-radius: 24px;
+    background: #f1f3f4;
+    border: none;
+    padding: 0 24px 0 52px;
+    font-size: 14px;
+    color: #3c4043;
+}
+.help-search-input:focus {
+    outline: none;
+    background: #e8eaed;
+}
+
+.help-search-wrapper .search-icon {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 20px;
+    color: #5f6368;
+}
+
+/* Đường kẻ ngang */
+.help-divider {
+    border: none;
+    border-top: 1px solid #e0e0e0;
+    margin: 16px 0;
+}
+
+/* Tiêu đề phụ "Bạn cần..." */
+.help-subtitle {
+    font-size: 14px;
+    font-weight: 500;
+    color: #202124;
+    padding: 0 24px;
+    margin: 16px 0 8px 0;
+}
+
+/* Mục có 2 dòng text (dùng lại từ lần trước) */
+.menu-item-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.4;
+}
+.sub-label {
+    font-size: 12px;
+    color: #5f6368;
+    /* Cho phép chữ dài xuống dòng */
+    white-space: normal; 
+    max-width: 220px; /* Giới hạn chiều rộng */
+}
+
+/* === CSS CHO PANEL ỨNG DỤNG GOOGLE === */
+
+.google-apps-panel {
+    position: absolute;
+    top: 56px;      /* Dưới navbar */
+    right: 68px;    /* Bên trái avatar */
+    width: 340px;
+    
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1001; /* Dưới panel "Trợ giúp" nhưng trên "Tạo" */
+    
+    /* Cấu trúc flex để chia header/content/footer */
+    display: flex;
+    flex-direction: column;
+    
+    /* Mặc định ẩn đi (giống menu "Tạo") */
+    display: none;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.1s ease-out, transform 0.1s ease-out;
+}
+
+/* Lớp 'show' để hiện */
+.google-apps-panel.show {
+    display: flex;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Khu vực cuộn (chứa lưới) */
+.apps-scroll-container {
+    max-height: 400px; /* Chiều cao tối đa trước khi cuộn */
+    overflow-y: auto;
+    padding: 16px 8px 8px 8px;
+    
+    /* Tùy chỉnh thanh cuộn (Webkit) */
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+        background: #d9dce3;
+        border-radius: 3px;
+    }
+}
+
+/* Lưới các ứng dụng */
+.apps-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Lưới 3 cột */
+    gap: 8px; /* Khoảng cách giữa các mục */
+}
+
+/* Từng mục ứng dụng */
+.app-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    
+    padding: 12px 8px;
+    border-radius: 8px;
+    
+    text-decoration: none;
+    color: #3c4043;
+    font-size: 13px;
+    text-align: center;
+    
+    transition: background-color 0.2s ease;
+}
+
+.app-item:hover {
+    background-color: #f1f3f4;
+}
+
+/* Icon ứng dụng */
+.app-item i {
+    font-size: 32px; /* Cỡ icon to */
+    color: #5f6368;
+    margin-bottom: 8px;
+}
+
+/* Nếu dùng <img> thay cho <i> */
+.app-item img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    margin-bottom: 8px;
+}
+
+
+/* Phần chân (nút "Sản phẩm khác") */
+.apps-footer {
+    padding: 12px 16px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.all-products-btn {
+    display: block;
+    width: 100%;
+    padding: 8px 16px;
+    text-align: center;
+    text-decoration: none;
+    color: #1a73e8;
+    font-size: 14px;
+    font-weight: 500;
+    border: 1px solid #dadce0;
+    border-radius: 20px;
+    transition: background-color 0.2s ease;
+}
+
+.all-products-btn:hover {
+    background-color: #f8f9fa;
+}
+
+ .main-content { 
+        position: fixed;        /* Fixed positioning */
+        top: 64px;              /* Below navbar (navbar height = 64px) */
+        left: 260px;            /* Right of sidebar (sidebar width = 260px) */
+        right: 0;               /* Full width to right edge */
+        bottom: 0;              /* Full height to bottom */
+        overflow-y: auto;       /* Scrollable content vertically */
+        overflow-x: hidden;     /* No horizontal scroll */
+        padding: 20px;
+        /* background: #ffffff;    Match body background */
+      }

@@ -1,0 +1,75 @@
+services:
+  # 1. Dịch vụ Nginx - Web Server
+  nginx:
+    image: nginx:alpine
+    container_name: gpc_nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+      - node
+    networks:
+      - gpc_network
+
+  # 2. Dịch vụ PHP-FPM - Laravel Backend
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: gpc_app
+    volumes:
+      - .:/var/www/html
+      - ./storage/app/public:/var/www/html/storage/app/public
+    depends_on:
+      - db
+    environment:
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=google_photos_clone
+      - DB_USERNAME=gg_user
+      - DB_PASSWORD=gg1234
+      - APP_ENV=local
+      - APP_DEBUG=true
+    networks:
+      - gpc_network
+
+  # 3. Dịch vụ Node.js - Frontend (Vite Dev Server)
+  node:
+    image: node:20-alpine
+    container_name: gpc_node
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+      - /var/www/html/node_modules
+    ports:
+      - "5173:5173"
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    networks:
+      - gpc_network
+
+  # 4. Dịch vụ Database - MySQL
+  db:
+    image: mysql:8.0
+    container_name: gpc_db
+    environment:
+      MYSQL_DATABASE: google_photos_clone
+      MYSQL_USER: gg_user
+      MYSQL_PASSWORD: gg1234
+      MYSQL_ROOT_PASSWORD: root_password
+    volumes:
+      - gpc_db_data:/var/lib/mysql
+    ports:
+      - "3307:3306"
+    networks:
+      - gpc_network
+
+networks:
+  gpc_network:
+    driver: bridge
+
+volumes:
+  gpc_db_data:

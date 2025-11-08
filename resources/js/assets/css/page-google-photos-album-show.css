@@ -1,0 +1,358 @@
+.albumshow-container.standalone {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 64px 24px 48px 24px;
+  background: #ffffff;
+}
+
+/* Standalone Topbar */
+.albumshow-topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: 64px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff;
+  border-bottom: 1px solid #e0e3e7;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.topbar-title {
+  font-size: 20px;
+  color: #202124;
+  font-weight: 400;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.topbar-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: #5f6368;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.topbar-btn:hover {
+  background: #f1f3f4;
+}
+
+.topbar-btn i {
+  font-size: 20px;
+}
+
+.topbar-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-left: 8px;
+  cursor: pointer;
+}
+
+.topbar-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Album Info Section (Cover + Details) */
+.albumshow-info-section {
+  display: flex;
+  gap: 32px;
+  margin: 50px 0px 32px 0px;
+  padding: 0 16px;
+}
+
+.albumshow-cover-card {
+  position: relative;
+  width: 380px;
+  height: 220px;
+  flex-shrink: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  background: #000;
+}
+
+.albumshow-cover-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cover-highlight-btn {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.95);
+  border: none;
+  border-radius: 20px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #202124;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.cover-highlight-btn i {
+  font-size: 16px;
+}
+
+.cover-highlight-btn:hover {
+  background: #fff;
+}
+
+.albumshow-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.album-main-title {
+  font-size: 36px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: #202124;
+  margin: 0 0 8px 0;
+}
+
+.album-date {
+  font-size: 14px;
+  color: #5f6368;
+  margin-bottom: 20px;
+}
+
+.album-participants {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.participant-link-btn,
+.participant-more,
+.participant-add-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid #dadce0;
+  background: #fff;
+  color: #5f6368;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.participant-link-btn:hover,
+.participant-more:hover,
+.participant-add-btn:hover {
+  background: #f1f3f4;
+}
+
+.participant-link-btn i,
+.participant-more i,
+.participant-add-btn i {
+  font-size: 18px;
+}
+
+.participant-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+  cursor: pointer;
+}
+
+.participant-circle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.albumshow-header {
+  display: flex;
+  gap: 48px;
+  margin-bottom: 40px;
+}
+
+.albumshow-cover {
+  position: relative;
+  width: 420px;
+  max-width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  background: #000;
+}
+
+.albumshow-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.albumshow-highlight-btn {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.92);
+  border: none;
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #202124;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  backdrop-filter: blur(4px);
+}
+
+.albumshow-highlight-btn i { font-size: 18px; }
+.albumshow-highlight-btn:hover { background: #fff; }
+
+.albumshow-meta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.albumshow-title {
+  font-size: 48px;
+  font-weight: 500;
+  line-height: 1.05;
+  color: #202124;
+  margin: 8px 0 12px 0;
+}
+
+.albumshow-daterange {
+  font-size: 15px;
+  color: #5f6368;
+  margin-bottom: 20px;
+}
+
+.albumshow-participants {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 20px;
+}
+
+.participant-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.12);
+}
+.participant-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.participant-add {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px dashed #d2e3fc;
+  background: #e8f0fe;
+  color: #1a73e8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background .15s ease;
+}
+.participant-add:hover { background: #d2e3fc; }
+.participant-add i { font-size: 20px; }
+
+.albumshow-actions {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid #e0e3e7;
+  color: #5f6368;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background .15s ease, box-shadow .15s ease;
+}
+.icon-btn:hover { background: #f1f3f4; }
+.icon-btn i { font-size: 20px; }
+
+/* Photo grid */
+.albumshow-photo-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.albumshow-photo-item {
+  position: relative;
+  height: 180px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #000;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.albumshow-photo-item img {
+  height: 100%;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+.albumshow-photo-item:hover { transform: scale(1.01); box-shadow: 0 8px 18px rgba(0,0,0,0.18); }
+
+/* Reuse existing lightbox styles from page-google-photos.css */

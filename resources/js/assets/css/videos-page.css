@@ -1,0 +1,325 @@
+/* Videos Page Styles */
+.videos-page {
+  min-height: 100vh;
+  background: #fff;
+}
+
+/* Header */
+.videos-header {
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 16px 24px;
+  position: sticky;
+  top: 0;
+  z-index: 99;
+}
+
+.videos-header-content {
+  max-width: 100%;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 8px;
+}
+
+.back-button {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #5f6368;
+  font-size: 24px;
+  transition: background 0.2s;
+  text-decoration: none;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.back-button:hover { background: #f1f3f4; }
+
+.close-button {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #5f6368;
+  font-size: 24px;
+  transition: background 0.2s;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.close-button:hover {
+  background: #f1f3f4;
+}
+
+/* Search Container */
+.search-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.search-box {
+  position: relative;
+  width: 100%;
+  max-width: 720px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20px;
+  color: #5f6368;
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px 20px 12px 56px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  color: #202124;
+  background: #f1f3f4;
+  transition: all 0.2s;
+  outline: none;
+}
+
+.search-input:hover {
+  background: #e8eaed;
+}
+
+.search-input:focus {
+  background: #fff;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
+}
+
+.search-input::placeholder {
+  color: #5f6368;
+}
+
+/* Video duration overlay (top-right corner) - Always visible */
+.video-duration {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  pointer-events: none;
+  z-index: 10;
+  opacity: 1 !important;
+  display: block !important;
+}
+
+/* Override photo-info opacity for video items to show duration */
+.video-item .photo-info {
+  opacity: 1 !important;
+  background: transparent !important;
+}
+
+/* Photo select button - show when any item selected */
+.photo-select {
+  opacity: 0;
+  transition: opacity 0.2s, background 0.2s;
+}
+
+.photo-item:hover .photo-select,
+.photo-select.visible {
+  opacity: 1;
+}
+
+.header-info { flex: 1; }
+
+.page-title {
+  font-size: 22px;
+  font-weight: 400;
+  color: #202124;
+  margin: 0 0 8px 0;
+}
+
+/* Blue album badge (like Screenshots page) */
+.album-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  background: #e8f0fe;
+  color: #1967d2;
+  font-size: 13px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+/* Container */
+.videos-container {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 24px;
+  padding-top: 0;
+}
+
+
+
+/* Selection toolbar overrides to cover header */
+.videos-container .selection-toolbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 101;
+  margin: 0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.videos-container .photo-grid { padding-top: 24px; }
+.videos-container.has-selection-toolbar .photo-grid { padding-top: 80px; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .videos-header-content { 
+    gap: 12px;
+    padding: 0 4px;
+  }
+  
+  .search-input {
+    font-size: 14px;
+    padding: 10px 16px 10px 48px;
+  }
+  
+  .search-icon {
+    left: 16px;
+    font-size: 18px;
+  }
+  
+  .page-title { font-size: 18px; }
+}
+
+
+ /* Photo Grid - Using flexbox for dynamic width based on aspect ratio */
+      .photo-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: flex-start;
+        /* padding-top: 18px;  Add top padding when toolbar is not shown */
+      }
+
+      /* Remove top padding when toolbar is visible */
+      .has-selection-toolbar .photo-grid {
+        padding-top: 0;
+      }
+
+  .photo-item { 
+    position: relative; 
+    cursor: pointer; 
+    overflow: hidden; 
+    border-radius: 12px; 
+    background: transparent; 
+    border: none; 
+    transition: transform .15s, box-shadow .15s;
+    height: 180px;  
+    flex-shrink: 0;  
+  }
+  .photo-item:hover { transform:scale(1.01); box-shadow:0 10px 24px rgba(0,0,0,.08); z-index:10; }
+
+      .photo-item img {
+        width: auto;  
+        height: 100%;  
+        display: block;
+        object-fit: contain;  
+      }
+
+      /* Section header like "Hôm qua", "Th 6, 31 thg 10" */
+      .date-divider {
+        width: 100%; 
+        flex-basis: 100%; 
+        /* padding: 10px 0 6px 0; */
+        font-size: 16px;
+        font-weight: 600;
+        color: #202124;
+        margin: 0;
+        letter-spacing: .2px;
+        text-align: left;
+        padding-left: 0;
+      }
+
+      /* Loading More Indicator */
+      .loading-more {
+        width: 100%;  /* Full width for flexbox layout */
+        flex-basis: 100%;  /* Take full row */
+        text-align: center;
+        padding: 24px;
+        color: #6a6f85;
+        font-size: 14px;
+      }
+
+      /* Floating Action Button */
+      .fab {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        width: 56px;
+        height: 56px;
+        border-radius: 28px;
+        background-color: #1a73e8;
+        border: none;
+        color: #fff;
+        font-size: 24px;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(26, 115, 232, 0.4);
+        transition: all 0.3s;
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+      }
+
+
+      .fab:hover {
+        background-color: #1557b0;
+        transform: scale(1.1);
+        box-shadow: 0 6px 16px rgba(26, 115, 232, 0.6);
+      }
+
+      /* Info Badge on Photo */
+  .photo-info{ position:absolute; inset:0; background:linear-gradient(to bottom, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.0) 60%, rgba(0,0,0,0.35) 100%); opacity:0; transition:opacity .15s; }
+      .photo-item:hover .photo-info{ opacity:1; }
+  /* Hide per-photo date badge by default to match Google Photos */
+  .photo-date{ position:absolute; bottom:6px; left:12px; font-size:12px; color:#fff; padding:4px 8px; border-radius:6px; border:none; display:none; }
+  .photo-item:hover .photo-date{ display:block; }
+  
+  /* Photo Select Checkbox (Left side) */
+  .photo-select{ 
+    position:absolute; 
+    top:8px; 
+    left:8px; 
+    width:32px; 
+    height:32px; 
+    border-radius:16px; 
+    background:#ffffff; 
+    border:1px solid #e5e7ee; 
+    display:flex; 
+    align-items:center; 
+    justify-content:center; 
+    color:#666; 
+    cursor:pointer;
+    transition: all 0.2s;
+  }
+  .photo-select:hover{ background:#eef2ff; color:#1a73e8; }
+  .photo-select.active{ background:#1a73e8; color:#fff; border-color:#1a73e8; }
+  

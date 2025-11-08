@@ -1,0 +1,264 @@
+
+
+/* === Google Photos Settings Page === */
+
+.settings-page-container{
+     position: fixed;
+        top: 64px;              /* Below navbar */
+        left: 260px;            /* Right of sidebar */
+        right: 0;               /* Full width to right edge */
+        bottom: 0;              /* Full height to bottom */
+        overflow-y: auto;       /* Scrollable content */
+        overflow-x: hidden;
+        padding: 24px;
+        background: #ffffff;
+        text-align: left; padding-left: 0;
+}
+
+.settings-container {
+    max-width: 900px; /* Giới hạn chiều rộng của nội dung */
+    margin: 0 auto; /* Căn giữa */
+}
+
+.settings-title {
+    font-size: 21px;
+    font-weight: 400;
+    color: #0a0a0a;
+    margin-bottom: 24px;
+    padding-left: 20px;
+    padding-bottom: 10px;
+    border-bottom: #dce1e5 1px solid;
+    /* padding-left: 12px; Thêm chút lề giống trong ảnh */
+}
+
+.settings-card {
+    background: #fff;
+    /* border: 1px solid #dce1e5; Viền xám nhạt */
+    border-radius: 8px;
+    overflow: hidden; /* Để bo góc hoạt động chuẩn */
+}
+
+.settings-divider {
+    border: none;
+    border-top: 1px solid #dce1e5;
+    margin: 0;
+}
+
+/* Kiểu cho các mục có nhiều padding (như nhóm radio) */
+.settings-section {
+    padding: 24px;
+}
+
+/* Kiểu cho các mục dạng danh sách (Title, Description, Action) */
+.settings-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+/* .settings-item:hover {
+    background-color: #f8f9fa; Màu nền khi hover
+} */
+
+.item-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.item-title {
+    font-size: 16px;
+    color: #3c4043;
+    font-weight: 500;
+}
+
+.item-description {
+    font-size: 14px;
+    color: #535455;
+    max-width: 550px; /* Giới hạn chiều rộng mô tả */
+    line-height: 1.4;
+}
+
+.item-action .item-action-link {
+    color: #1a73e8;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 4px;
+}
+.item-action .item-action-link:hover {
+    background-color: #f0f6ff;
+}
+
+.item-action-icon{
+    font-size: 24px;
+     color: #5f6368;
+}
+
+
+/* Tiêu đề cho nhóm (ví dụ: "Chất lượng sao lưu...") */
+.settings-group-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: #555556;
+    margin-bottom: 20px;
+}
+
+/* Tùy chọn Radio */
+.radio-option {
+    display: flex;
+    align-items: flex-start; /* Căn radio với dòng đầu tiên */
+    gap: 16px;
+    margin-bottom: 16px;
+    cursor: pointer;
+}
+
+.radio-option input[type="radio"] {
+    accent-color: #1a73e8; /* Màu radio khi được chọn */
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+}
+
+.radio-label .radio-label-title {
+    font-size: 17px;
+    color: #030303;
+}
+.radio-label .radio-label-description {
+    font-size: 16px;
+    color: #555556;
+    margin-top: 4px;
+    line-height: 1.4;
+}
+
+/* Nút bấm */
+.settings-buttons {
+    margin-top: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.btn-primary {
+    background-color: #1a73e8;
+    color: #fff;
+    text-decoration: none;
+    padding: 8px 24px;
+    border-radius: 18px; /* Bo tròn */
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+}
+.btn-primary:hover {
+    background-color: #186bd1;
+}
+
+.btn-secondary {
+    color: #1a73e8;
+    background: transparent;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 18px;
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+}
+.btn-secondary:hover {
+    background-color: #2b7aef;
+}
+
+/* Toggle Switch */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 36px;
+    height: 20px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #bdc1c6; /* Màu khi TẮT (track) */
+    transition: .4s;
+    border-radius: 10px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white; /* Màu nút trượt */
+    transition: .4s;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+input:checked + .slider {
+    background-color: #8ab4f8; /* Màu khi BẬT (track) */
+}
+
+input:checked + .slider:before {
+    background-color: #1a73e8; /* Màu khi BẬT (nút trượt) */
+    transform: translateX(16px);
+}
+
+/* Kiểu cho toggle bị vô hiệu hóa */
+.toggle-switch input:disabled + .slider {
+    background-color: #e0e0e0;
+    cursor: not-allowed;
+}
+
+.toggle-switch input:disabled + .slider:before {
+    background-color: #f5f5f5;
+}
+
+/* === CSS cho mục cài đặt mở rộng === */
+
+/* 1. Ẩn nội dung đi theo mặc định */
+.expandable-content {
+    display: none;
+    /* Thêm màu nền để phân biệt với trigger */
+    background-color: #f7f8fb; 
+    border-top: 1px solid #dce1e5;
+}
+
+/* 2. Thêm hiệu ứng chuyển động cho mũi tên */
+.settings-item.expandable-trigger .item-action-icon i {
+    transition: transform 0.25s ease;
+}
+
+/* 3. Khi trigger có class 'is-open' (do JS thêm vào) */
+.settings-item.expandable-trigger.is-open .item-action-icon i {
+    /* Xoay mũi tên 180 độ (từ dưới lên trên) */
+    transform: rotate(180deg);
+}
+
+/* 4. Hiển thị nội dung khi trigger có class 'is-open' */
+.settings-item.expandable-trigger.is-open + .expandable-content {
+    display: block;
+}
+
+.button-description {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
