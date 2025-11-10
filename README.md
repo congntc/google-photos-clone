@@ -481,7 +481,7 @@ This project is open-sourced software licensed under the [MIT license](https://o
 
 **Your Name**
 - GitHub: [@congntc](https://github.com/congntc)
-- Email: your.email@example.com
+- Email: nguyentheconght@gmail.com
 
 ## 🙏 Acknowledgments
 
