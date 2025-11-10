@@ -169,7 +169,51 @@
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 32px;
+  font-size:14px;
+}
+
+/* Album create/select header refinement */
+.header-actions .action-upload,
+.header-actions .action-done {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  height:40px;
+  padding:0 20px;
+  border-radius:20px;
+  font-size:14px;
+  font-weight:500;
+  text-decoration:none;
+  cursor:pointer;
+  border:none;
+  background:transparent;
+  color:#1a73e8;
+  transition:background .15s ease, box-shadow .15s ease;
+}
+
+.header-actions .action-upload:hover,
+.header-actions .action-done:hover {
+  background:#e8f0fe;
+}
+
+.header-actions .action-done {
+  background:#1a73e8;
+  color:#fff;
+  font-weight:600;
+  min-width:90px;
+}
+
+.header-actions .action-done:hover {
+  background:#1765d1;
+}
+
+.header-actions .action-upload i { font-size:18px; margin-right:6px; }
+
+@media (max-width: 640px) {
+  .header-actions { gap:12px; }
+  .header-actions .action-upload,
+  .header-actions .action-done { height:36px; padding:0 14px; font-size:13px; }
 }
 
 /* Container */
@@ -220,3 +264,5 @@
     font-size: 18px;
   }
 }
+
+/* Remove inline override; keep original circle button style for generic close */

@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\PhotoController;
+use App\Http\Controllers\AlumController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -31,8 +32,7 @@ Route::middleware('auth')->group(function () {
     
     Route::controller(PhotoController::class)->group(function () {
         Route::get('/photos', 'index')->name('photos.index');
-        Route::get('/albums', 'albums')->name('photos.albums');
-    Route::get('/albums/{id}', 'albumShow')->name('photos.albums.show');
+        // other photo-related routes
         Route::get('/archive', 'archive')->name('photos.archive');
         Route::get('/bin', 'bin')->name('photos.bin');
         Route::get('/documents', 'documents')->name('photos.documents');
@@ -52,5 +52,45 @@ Route::middleware('auth')->group(function () {
 
         // Upload
         Route::post('/photos/upload', 'upload')->name('photos.upload');
+        
+        // Toggle favorite
+        Route::post('/photos/toggle-favorite', 'toggleFavorite')->name('photos.toggleFavorite');
+        
+        // Delete batch (Soft Delete - vào thùng rác)
+        Route::post('/photos/delete-batch', 'deleteBatch')->name('photos.deleteBatch');
+        
+        // Restore from bin (Khôi phục từ thùng rác)
+        Route::post('/photos/restore-batch', 'restoreBatch')->name('photos.restoreBatch');
+        
+        // Force delete (Xóa vĩnh viễn)
+        Route::post('/photos/force-delete-batch', 'forceDeleteBatch')->name('photos.forceDeleteBatch');
+        
+        // Get bin photos (Lấy danh sách ảnh trong thùng rác)
+        Route::get('/api/photos/bin', 'getBinPhotos')->name('photos.getBin');
+        
+        // Download photo
+        Route::get('/photos/{id}/download', 'download')->name('photos.download');
+    });
+
+    // Albums routes
+    Route::controller(AlumController::class)->group(function () {
+        Route::get('/albums', 'index')->name('albums.index');
+        
+        // API: Get user's albums for modal
+        Route::get('/api/albums/user', 'getUserAlbums')->name('albums.api.user');
+        
+        // Specific routes first to avoid conflicts with dynamic {id}
+        Route::get('/albums/create/select', 'createSelect')->name('albums.create.select');
+        Route::get('/albums/create', 'create')->name('albums.create');
+        Route::post('/albums', 'store')->name('albums.store');
+        Route::get('/albums/{id}', 'show')->whereNumber('id')->name('albums.show');
+        // Select and attach existing photos to an album
+        Route::get('/albums/{id}/select', 'select')->whereNumber('id')->name('albums.select');
+        Route::post('/albums/{id}/attach', 'attachExistingPhotos')->whereNumber('id')->name('albums.attach');
+        Route::patch('/albums/{id}', 'update')->whereNumber('id')->name('albums.update');
+        Route::delete('/albums/{id}', 'destroy')->whereNumber('id')->name('albums.destroy');
+        Route::post('/albums/{id}/photos', 'addPhotos')->whereNumber('id')->name('albums.addPhotos');
+        Route::post('/albums/{id}/photos/remove-batch', 'removePhotosBatch')->whereNumber('id')->name('albums.removePhotosBatch');
+        Route::delete('/albums/{id}/photos/{photoId}', 'removePhoto')->whereNumber('id')->whereNumber('photoId')->name('albums.removePhoto');
     });
 });

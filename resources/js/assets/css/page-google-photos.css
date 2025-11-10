@@ -98,6 +98,50 @@
         background: rgba(255, 255, 255, 0.15);
       }
 
+      /* Toolbar Menu Wrapper & Dropdown Styles */
+      .toolbar-menu-wrapper {
+        position: relative;
+        display: inline-block;
+      }
+
+      .toolbar-dropdown {
+        position: absolute;
+        right: 0;
+        top: 100%;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        padding: 8px;
+        min-width: 200px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 50;
+      }
+
+      .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        text-align: left;
+        background: transparent;
+        border: none;
+        padding: 10px 12px;
+        cursor: pointer;
+        font-size: 14px;
+        border-radius: 4px;
+        transition: background 0.2s;
+        color: #202124;
+      }
+
+      .dropdown-item:hover {
+        background: #f1f3f4;
+      }
+
+      .dropdown-item i {
+        font-size: 18px;
+        color: #5f6368;
+      }
+
       /* Photo Grid - Using flexbox for dynamic width based on aspect ratio */
       .photo-grid {
         display: flex;
@@ -359,6 +403,14 @@
         color: #ff6b6b;
       }
 
+      .lightbox-btn-favorite.active {
+        color: #ff6b6b;
+      }
+
+      .lightbox-btn-favorite.active i {
+        color: #ff6b6b;
+      }
+
       .lightbox-btn-delete {
         background: #dc3545;
         margin-left: 8px;
@@ -419,6 +471,188 @@
         right: 20px;
       }
 
+      .left-sidebar-title{
+        padding-left: 10px;
+      }
+
+      /* Album Modal Styles */
+      .album-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        padding: 20px;
+      }
+
+      .album-modal-content {
+        background: #fff;
+        border-radius: 12px;
+        width: 100%;
+        max-width: 600px;
+        max-height: 80vh;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      }
+
+      .album-modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px 24px;
+        border-bottom: 1px solid #e0e0e0;
+      }
+
+
+
+      .album-modal-header h1 {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 500;
+        color: #202124;
+      }
+
+      .album-modal-close {
+        background: transparent;
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.2s;
+        font-size: 24px;
+        color: #5f6368;
+      }
+
+      .album-modal-close:hover {
+        background: #f1f3f4;
+      }
+
+      .album-create-new-btn {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 16px 24px;
+        padding: 12px 16px;
+        background: #fff;
+        border: 1px solid #dadce0;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        color: #1a73e8;
+        transition: all 0.2s;
+      }
+
+      .album-create-new-btn:hover {
+        background: #f8f9fa;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .album-create-new-btn i {
+        font-size: 20px;
+      }
+
+      .album-list {
+        flex: 1;
+        overflow-y: auto;
+        padding: 0 24px 24px;
+      }
+
+      .album-loading,
+      .album-empty {
+        text-align: center;
+        padding: 40px 20px;
+        color: #5f6368;
+        font-size: 14px;
+      }
+
+      .album-item {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.2s;
+        margin-bottom: 8px;
+      }
+
+      .album-item:hover {
+        background: #f8f9fa;
+      }
+
+      .album-cover {
+        width: 60px;
+        height: 60px;
+        border-radius: 6px;
+        overflow: hidden;
+        background: #f1f3f4;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .album-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .album-no-cover {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        color: #9aa0a6;
+      }
+
+      .album-no-cover i {
+        font-size: 28px;
+      }
+
+      .album-info {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .album-title {
+        font-size: 15px;
+        font-weight: 500;
+        color: #202124;
+        margin-bottom: 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .album-meta {
+        font-size: 13px;
+        color: #5f6368;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .album-separator {
+        color: #dadce0;
+      }
+
+  
+
+
+ 
   
 
 

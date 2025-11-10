@@ -3,6 +3,15 @@ import { PageProps } from '@/types';
 import AppLayout from '@/Layouts/app';
 import '../assets/css/page-google-photos.css';
 
+interface AlbumItem {
+  id: number;
+  title: string;
+  description?: string;
+  photos_count: number;
+  cover_url?: string;
+  created_at: string;
+}
+
 interface PhotoItem {
   id: number;
   url: string;
@@ -44,7 +53,12 @@ export default function PageGooglePhotos({ photos: initialPhotos = [], auth }: P
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState<number | null>(null);
   const [zoomLevel, setZoomLevel] = useState(100);
   const uploadRef = useRef<HTMLInputElement | null>(null);
-
+  const [showOptionsMenu, setShowOptionsMenu] = useState(false);
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
+  const [showAlbumModal, setShowAlbumModal] = useState(false);
+  const [albums, setAlbums] = useState<AlbumItem[]>([]);
+  const [loadingAlbums, setLoadingAlbums] = useState(false);
+  
   // Debug: log auth status
   console.log('Auth user:', auth?.user);
   console.log('Photos count:', photos.length);
@@ -65,6 +79,223 @@ export default function PageGooglePhotos({ photos: initialPhotos = [], auth }: P
     });
   }, []);
 
+  // Xử lý thêm/bỏ yêu thích
+  const handleToggleFavorite = useCallback((ids: number[], isFavorite: boolean) => {
+    fetch('/photos/toggle-favorite', {
+      method: 'POST',
+      headers: {
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({ ids, is_favorite: isFavorite }),
+    })
+      .then(async response => {
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.message || 'Lỗi khi cập nhật');
+        }
+        
+        if (data.success) {
+          // Cập nhật state photos
+          setPhotos(prevPhotos => 
+            prevPhotos.map(p => 
+              ids.includes(p.id) ? { ...p, is_favorite: isFavorite } : p
+            )
+          );
+          
+          // Cập nhật favoriteIds
+          setFavoriteIds(prev => {
+            const next = new Set(prev);
+            if (isFavorite) {
+              ids.forEach(id => next.add(id));
+            } else {
+              ids.forEach(id => next.delete(id));
+            }
+            return next;
+          });
+          
+          // Xóa selection sau khi thêm vào yêu thích
+          setSelectedIds(new Set());
+        } else {
+          throw new Error(data.message || 'Lỗi khi cập nhật');
+        }
+      })
+      .catch(error => {
+        console.error('Toggle favorite error:', error);
+        alert(error.message || 'Lỗi khi cập nhật. Vui lòng thử lại!');
+      });
+  }, []);
+
+  // Xử lý toggle favorite từ selection toolbar
+  const handleToggleFavoriteSelected = useCallback(() => {
+    if (selectedIds.size === 0) return;
+    
+    const ids = Array.from(selectedIds);
+    // Kiểm tra nếu tất cả đã là favorite thì bỏ, ngược lại thì thêm
+    const allFavorite = ids.every(id => favoriteIds.has(id));
+    handleToggleFavorite(ids, !allFavorite);
+  }, [selectedIds, favoriteIds, handleToggleFavorite]);
+
+  // Xử lý toggle favorite từ lightbox
+  const handleLightboxToggleFavorite = useCallback(() => {
+    if (currentPhotoIndex === null) return;
+    
+    const photo = photos[currentPhotoIndex];
+    handleToggleFavorite([photo.id], !photo.is_favorite);
+  }, [currentPhotoIndex, photos, handleToggleFavorite]);
+
+ 
+
+  // Xử lý xóa ảnh
+  const handleDelete = useCallback(() => {
+    if (selectedIds.size === 0) return;
+    
+    // if (!confirm(`Bạn có chắc chắn muốn xóa ${selectedIds.size} ảnh/video?`)) {
+    //   return;
+    // }
+
+    const ids = Array.from(selectedIds);
+    
+    fetch('/photos/delete-batch', {
+      method: 'POST',
+      headers: {
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({ ids }),
+    })
+      .then(async response => {
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.message || 'Lỗi khi xóa');
+        }
+        
+        if (data.success) {
+          // Xóa ảnh khỏi state
+          setPhotos(prevPhotos => prevPhotos.filter(p => !selectedIds.has(p.id)));
+          setSelectedIds(new Set());
+          alert(`Đã chuyển ${ids.length} ảnh/video vào thùng rác. Bạn có 60 ngày để khôi phục.`);
+        } else {
+          throw new Error(data.message || 'Lỗi khi xóa');
+        }
+      })
+      .catch(error => {
+        console.error('Delete error:', error);
+        alert(error.message || 'Lỗi khi xóa. Vui lòng thử lại!');
+      });
+  }, [selectedIds]);
+
+   // Xử lý xóa ảnh/video từ lightbox
+  const handleLightboxDelete = useCallback(() => {
+    if (currentPhotoIndex === null) return;
+    
+    const photo = photos[currentPhotoIndex];
+    
+    // if (!confirm(`Bạn có chắc chắn muốn xóa "${photo.original_filename}"?`)) {
+    //   return;
+    // }
+
+    fetch('/photos/delete-batch', {
+      method: 'POST',
+      headers: {
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({ ids: [photo.id] }),
+    })
+      .then(async response => {
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.message || 'Lỗi khi xóa');
+        }
+        
+        if (data.success) {
+          // Xóa ảnh khỏi state
+          setPhotos(prevPhotos => prevPhotos.filter(p => p.id !== photo.id));
+          
+          // Đóng lightbox và quay về trang Photos
+          setCurrentPhotoIndex(null);
+          
+          // Hiển thị thông báo
+          alert('Đã chuyển ảnh/video vào thùng rác. Bạn có 60 ngày để khôi phục.');
+        } else {
+          throw new Error(data.message || 'Lỗi khi xóa');
+        }
+      })
+      .catch(error => {
+        console.error('Delete error:', error);
+        alert(error.message || 'Lỗi khi xóa. Vui lòng thử lại!');
+      });
+  }, [currentPhotoIndex, photos]); 
+
+  // Xử lý tải xuống ảnh
+  const onDownloadSelected = useCallback(() => {
+    if (selectedIds.size === 0) return;
+    
+    const ids = Array.from(selectedIds);
+    
+    // Download từng ảnh
+    ids.forEach(id => {
+      const link = document.createElement('a');
+      link.href = `/photos/${id}/download`;
+      link.download = '';
+      link.click();
+    });
+  }, [selectedIds]);
+
+  // Xử lý tải xuống ảnh/video từ lightbox
+  const handleLightboxDownload = useCallback(() => {
+    if (currentPhotoIndex === null) return;
+    
+    const photo = photos[currentPhotoIndex];
+    const link = document.createElement('a');
+    link.href = `/photos/${photo.id}/download`;
+    link.download = '';
+    link.click();
+  }, [currentPhotoIndex, photos]);
+
+  // Mở modal album và tải danh sách albums
+  const handleOpenAlbumModal = useCallback(() => {
+    setShowAlbumModal(true);
+    setLoadingAlbums(true);
+    
+    fetch('/api/albums/user', {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+      },
+    })
+      .then(async response => {
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.message || 'Lỗi khi tải albums');
+        }
+        
+        if (data.success) {
+          setAlbums(data.albums || []);
+        } else {
+          throw new Error(data.message || 'Lỗi khi tải albums');
+        }
+      })
+      .catch(error => {
+        console.error('Load albums error:', error);
+        alert(error.message || 'Lỗi khi tải danh sách albums!');
+      })
+      .finally(() => {
+        setLoadingAlbums(false);
+      });
+  }, []);
+
+
+
+ // Tải ảnh lên từ máy tính
   const onUploadClick = useCallback(() => {
     // Kiểm tra user đã đăng nhập chưa
     if (!auth?.user) {
@@ -75,6 +306,7 @@ export default function PageGooglePhotos({ photos: initialPhotos = [], auth }: P
     uploadRef.current?.click();
   }, [auth]);
 
+  // Xử lý khi chọn file để tải lên
   const onUploadChange = useCallback((e: any) => {
     const files = Array.from(e.target.files || []) as File[];
     if (!files.length) return;
@@ -102,8 +334,13 @@ export default function PageGooglePhotos({ photos: initialPhotos = [], auth }: P
         }
         
         if (data.success) {
-          // Reload trang để lấy dữ liệu mới từ server
-          window.location.reload();
+          // Cập nhật giao diện bằng cách thêm photos mới vào đầu danh sách
+          if (data.photos && data.photos.length > 0) {
+            setPhotos(prevPhotos => [...data.photos, ...prevPhotos]);
+          }
+          
+          // Hiển thị thông báo thành công (tùy chọn)
+          // alert(data.message);
         } else {
           throw new Error(data.message || 'Lỗi khi tải lên');
         }
@@ -137,7 +374,8 @@ export default function PageGooglePhotos({ photos: initialPhotos = [], auth }: P
       const dayOfWeek = ['CN', 'Th 2', 'Th 3', 'Th 4', 'Th 5', 'Th 6', 'Th 7'][photoDate.getDay()];
       const day = photoDate.getDate();
       const month = photoDate.getMonth() + 1;
-      return `${dayOfWeek}, ${day} thg ${month}`;
+      const year = photoDate.getFullYear();
+      return `${dayOfWeek}, ${day} thg ${month} ${year}`;
     }
   };
 
@@ -225,26 +463,57 @@ export default function PageGooglePhotos({ photos: initialPhotos = [], auth }: P
                <span className="selection-count">{selectedIds.size} đã chọn</span>
              </div>
              <div className="toolbar-actions">
-               <button className="toolbar-btn" title="Xóa">
+               <button className="toolbar-btn" onClick={handleDelete} title="Xóa">
                  <i className="las la-trash" />
-                 {/* <span>Xóa</span> */}
                </button>
-               <button className="toolbar-btn" title="Thêm vào album">
-                 <i className="las la-folder-plus" />
-                 {/* <span>Thêm vào album</span> */}
-               </button>
-                <button className="toolbar-btn" title="Thêm vào yêu thích">
+               <button className="toolbar-btn" onClick={handleToggleFavoriteSelected} title="Thêm vào yêu thích">
                  <i className="las la-heart" />
-                 {/* <span>Thêm vào yêu thích</span> */}
                </button>
-               <button className="toolbar-btn" title="Tạo album mới">
-                 <i className="las la-plus-circle" />
-                 {/* <span>Tạo album mới</span> */}
-               </button>
+               <div className="toolbar-menu-wrapper" style={{ position: 'relative', display: 'inline-block' }}>
+                 <button className="toolbar-btn" title="Tùy chọn khác" onClick={() => setShowOptionsMenu(m => !m)}>
+                   <i className="las la-plus-circle" />
+                 </button>
+                 {showOptionsMenu && (
+                   <div className="toolbar-dropdown" style={{ position: 'absolute', right: 0, top: '100%', background: '#fff', border: '1px solid #ddd', borderRadius: 6, padding: 8, minWidth: 200, boxShadow: '0 4px 12px rgba(0,0,0,0.15)', zIndex: 50 }}>
+                     <button className="dropdown-item" onClick={handleOpenAlbumModal} >
+                       <i className="las la-book" />
+                       <span className="left-sidebar-title">Album</span>
+                     </button>
+                     <button className="dropdown-item" onClick={() => alert('Album chia sẻ.')} >
+                       <i className="las la-user-friends" />
+                       <span className="left-sidebar-title">Album chia sẻ</span>
+                     </button>
+                     <button className="dropdown-item" onClick={() => alert('Tài liệu')} >
+                       <i className="las la-file-alt" />
+                       <span className="left-sidebar-title">Tài liệu</span>
+                     </button>
+                   </div>
+                 )}
+               </div>
                <button className="toolbar-btn" title="Chia sẻ">
-                 <i className="las la-share-alt" />
-                 <span>Chia sẻ</span>
+                 <i className="fa-solid fa-share-nodes"></i>
                </button>
+               <div className="toolbar-menu-wrapper" style={{ position: 'relative', display: 'inline-block' }}>
+                 <button className="toolbar-btn" title="Tùy chọn khác" onClick={() => setShowMoreMenu(m => !m)}>
+                   <i className="fa-solid fa-ellipsis-vertical"></i>
+                 </button>
+                 {showMoreMenu && (
+                   <div className="toolbar-dropdown" style={{ position: 'absolute', right: 0, top: '100%', background: '#fff', border: '1px solid #ddd', borderRadius: 6, padding: 8, minWidth: 200, boxShadow: '0 4px 12px rgba(0,0,0,0.15)', zIndex: 50 }}>
+                     <button className="dropdown-item" onClick={onDownloadSelected} >
+                       <span className="left-sidebar-title">Tải xuống</span>
+                    </button>
+                     <button className="dropdown-item" onClick={() => alert('Sẽ thêm chỉnh sửa ngày & giờ.')} >
+                       <span className="left-sidebar-title">Chỉnh sửa ngày & giờ</span>
+                    </button>
+                     <button className="dropdown-item" onClick={() => alert('Sẽ thêm chỉnh sửa vị trí.')} >
+                       <span className="left-sidebar-title">Chỉnh sửa vị trí</span>
+                    </button>
+                     <button className="dropdown-item" onClick={() => alert('Ảnh không nằm trong thùng rác.')} >
+                       <span className="left-sidebar-title">Chuyển khỏi thùng rác</span>
+                    </button>
+                   </div>
+                 )}
+               </div>
              </div>
            </div>
          )}
@@ -258,6 +527,55 @@ export default function PageGooglePhotos({ photos: initialPhotos = [], auth }: P
           <input ref={uploadRef} type="file" accept="image/*,video/*" multiple style={{ display: 'none' }} onChange={onUploadChange} />
         </div>
       </AppLayout>
+
+      {/* Album Modal */}
+      {showAlbumModal && (
+        <div className="album-modal-overlay" onClick={() => setShowAlbumModal(false)}>
+          <div className="album-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="album-modal-header">
+              <h1>Thêm vào</h1>
+              <button className="album-modal-close" onClick={() => setShowAlbumModal(false)}>
+                <i className="las la-times" />
+              </button>
+            </div>
+            
+            <button className="album-create-new-btn">
+              <i className="las la-plus-circle" />
+              <span>Album mới</span>
+            </button>
+
+            <div className="album-list">
+              {loadingAlbums ? (
+                <div className="album-loading">Đang tải...</div>
+              ) : albums.length === 0 ? (
+                <div className="album-empty">Bạn chưa có album nào</div>
+              ) : (
+                albums.map(album => (
+                  <div key={album.id} className="album-item" onClick={() => alert(`Thêm vào album: ${album.title}`)}>
+                    <div className="album-cover">
+                      {album.cover_url ? (
+                        <img src={album.cover_url} alt={album.title} />
+                      ) : (
+                        <div className="album-no-cover">
+                          <i className="las la-images" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="album-info">
+                      <div className="album-title">{album.title}</div>
+                      <div className="album-meta">
+                        <span>{album.created_at}</span>
+                        <span className="album-separator">•</span>
+                        <span>{album.photos_count} mục</span>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Lightbox Modal - Completely outside AppLayout for true fullscreen */}
       {currentPhotoIndex !== null && (
@@ -283,13 +601,17 @@ export default function PageGooglePhotos({ photos: initialPhotos = [], auth }: P
               <button className="lightbox-btn" title="Thông tin">
                 <i className="las la-info-circle" />
               </button>
-              <button className="lightbox-btn" title="Tải xuống">
+              <button className="lightbox-btn" onClick={handleLightboxDownload} title="Tải xuống">
                 <i className="las la-download" />
               </button>
-              <button className="lightbox-btn lightbox-btn-favorite" title="Yêu thích">
-                <i className="las la-heart" />
+              <button 
+                className={`lightbox-btn lightbox-btn-favorite${photos[currentPhotoIndex].is_favorite ? ' active' : ''}`} 
+                onClick={handleLightboxToggleFavorite} 
+                title={photos[currentPhotoIndex].is_favorite ? "Bỏ yêu thích" : "Yêu thích"}
+              >
+                <i className={photos[currentPhotoIndex].is_favorite ? "las la-heart" : "lar la-heart"} />
               </button>
-              <button className="lightbox-btn lightbox-btn-delete" title="Xóa">
+              <button className="lightbox-btn lightbox-btn-delete" onClick={handleLightboxDelete} title="Xóa">
                 <i className="las la-trash" />
               </button>
               <button className="lightbox-btn" onClick={() => setCurrentPhotoIndex(null)} title="Đóng">

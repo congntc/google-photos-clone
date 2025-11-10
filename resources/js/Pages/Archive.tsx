@@ -157,6 +157,13 @@ export default function PageGooglePhotos() {
     <>
       <AppLayout>
         <div className={`photos-page-container${selectedIds.size > 0 ? ' has-selection-toolbar' : ''}`}>
+          <div className="archive-header">
+            <div className="page-header">Kho lưu trữ</div>
+
+            <button className="add-photos-btn" onClick={handleAddPhotos}>
+              <i className="las la-plus"></i> <span>Thêm ảnh</span>
+            </button>
+          </div>
          {/* Selection Toolbar */}
          {selectedIds.size > 0 && (
            <div className="selection-toolbar">
@@ -187,13 +194,7 @@ export default function PageGooglePhotos() {
            </div>
          )}
          
-         <div className="archive-header">
-          <div className="page-header">Kho lưu trữ</div>
-
-          <button className="add-photos-btn" onClick={handleAddPhotos}>
-            <i className="las la-plus"></i> <span>Thêm ảnh</span>
-          </button>
-        </div>
+         
 
          <div className="photo-grid" id="photoGrid">
             {renderedItems}

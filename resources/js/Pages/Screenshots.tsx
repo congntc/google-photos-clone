@@ -19,6 +19,15 @@ interface ScreenshotItem {
   year: string;
 }
 
+interface AlbumItem {
+  id: number;
+  title: string;
+  description?: string;
+  photos_count: number;
+  cover_url?: string;
+  created_at: string;
+}
+
 // Helper to inject external icon fonts
 const ensureIconCss = (): void => {
   const links = [
@@ -59,6 +68,12 @@ export default function Screenshots() {
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState<number | null>(null);
   const [zoomLevel, setZoomLevel] = useState(100);
   const uploadRef = useRef(null);
+  const [showOptionsMenu, setShowOptionsMenu] = useState(false);
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
+  const [showAlbumModal, setShowAlbumModal] = useState(false);
+  const [albums, setAlbums] = useState<AlbumItem[]>([]);
+  const [loadingAlbums, setLoadingAlbums] = useState(false);
+  
 
   const onToggleFavorite = useCallback((id) => {
     setFavoriteIds((prev) => {
@@ -162,6 +177,56 @@ export default function Screenshots() {
     return out;
   }, [screenshots, favoriteIds, selectedIds, onToggleFavorite, onToggleSelect]);
 
+  // Xử lý xóa ảnh
+    
+      // Xử lý tải xuống ảnh
+      const onDownloadSelected = useCallback(() => {
+        if (selectedIds.size === 0) return;
+        
+        const ids = Array.from(selectedIds);
+        
+        // Download từng ảnh
+        ids.forEach(id => {
+          const link = document.createElement('a');
+          link.href = `/photos/${id}/download`;
+          link.download = '';
+          link.click();
+        });
+      }, [selectedIds]);
+
+     // Mở modal album và tải danh sách albums
+      const handleOpenAlbumModal = useCallback(() => {
+        setShowAlbumModal(true);
+        setLoadingAlbums(true);
+        
+        fetch('/api/albums/user', {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+          },
+        })
+          .then(async response => {
+            const data = await response.json();
+            
+            if (!response.ok) {
+              throw new Error(data.message || 'Lỗi khi tải albums');
+            }
+            
+            if (data.success) {
+              setAlbums(data.albums || []);
+            } else {
+              throw new Error(data.message || 'Lỗi khi tải albums');
+            }
+          })
+          .catch(error => {
+            console.error('Load albums error:', error);
+            alert(error.message || 'Lỗi khi tải danh sách albums!');
+          })
+          .finally(() => {
+            setLoadingAlbums(false);
+          });
+      }, []);
+
   return (
     <>
       <Head title="Ảnh chụp màn hình" />
@@ -205,22 +270,57 @@ export default function Screenshots() {
                <span className="selection-count">{selectedIds.size} đã chọn</span>
              </div>
              <div className="toolbar-actions">
-               <button className="toolbar-btn" title="Xóa">
-                 <i className="las la-trash" />
-                 <span>Xóa</span>
-               </button>
-               <button className="toolbar-btn" title="Thêm vào album">
-                 <i className="las la-folder-plus" />
-                 <span>Thêm vào album</span>
-               </button>
-               <button className="toolbar-btn" title="Tạo album mới">
-                 <i className="las la-plus-circle" />
-                 <span>Tạo album mới</span>
-               </button>
+                <button className="toolbar-btn" title="Xóa">
+                  <i className="las la-trash" />
+                </button>
+                <button className="toolbar-btn" title="Thêm vào yêu thích">
+                  <i className="las la-heart" />
+                </button>
+                <div className="toolbar-menu-wrapper" style={{ position: 'relative', display: 'inline-block' }}>
+                  <button className="toolbar-btn" title="Tùy chọn khác" onClick={() => setShowOptionsMenu(m => !m)}>
+                    <i className="las la-plus-circle" />
+                  </button>
+                  {showOptionsMenu && (
+                    <div className="toolbar-dropdown" style={{ position: 'absolute', right: 0, top: '100%', background: '#fff', border: '1px solid #ddd', borderRadius: 6, padding: 8, minWidth: 200, boxShadow: '0 4px 12px rgba(0,0,0,0.15)', zIndex: 50 }}>
+                      <button className="dropdown-item" onClick={handleOpenAlbumModal} >
+                          <i className="las la-book" />
+                          <span className="left-sidebar-title">Album</span>
+                      </button>
+                      <button className="dropdown-item" onClick={() => alert('Album chia sẻ.')} >
+                          <i className="las la-user-friends" />
+                          <span className="left-sidebar-title">Album chia sẻ</span>
+                      </button>
+                      <button className="dropdown-item" onClick={() => alert('Tài liệu')} >
+                          <i className="las la-file-alt" />
+                          <span className="left-sidebar-title">Tài liệu</span>
+                      </button>
+                    </div>
+                  )}
+               </div>
                <button className="toolbar-btn" title="Chia sẻ">
-                 <i className="las la-share-alt" />
-                 <span>Chia sẻ</span>
+                 <i className="fa-solid fa-share-nodes"></i>
                </button>
+               <div className="toolbar-menu-wrapper" style={{ position: 'relative', display: 'inline-block' }}>
+                 <button className="toolbar-btn" title="Tùy chọn khác" onClick={() => setShowMoreMenu(m => !m)}>
+                   <i className="fa-solid fa-ellipsis-vertical"></i>
+                 </button>
+                 {showMoreMenu && (
+                   <div className="toolbar-dropdown" style={{ position: 'absolute', right: 0, top: '100%', background: '#fff', border: '1px solid #ddd', borderRadius: 6, padding: 8, minWidth: 200, boxShadow: '0 4px 12px rgba(0,0,0,0.15)', zIndex: 50 }}>
+                     <button className="dropdown-item" onClick={onDownloadSelected} >
+                       <span className="left-sidebar-title">Tải xuống</span>
+                    </button>
+                     <button className="dropdown-item" onClick={() => alert('Sẽ thêm chỉnh sửa ngày & giờ.')} >
+                       <span className="left-sidebar-title">Chỉnh sửa ngày & giờ</span>
+                    </button>
+                     <button className="dropdown-item" onClick={() => alert('Sẽ thêm chỉnh sửa vị trí.')} >
+                       <span className="left-sidebar-title">Chỉnh sửa vị trí</span>
+                    </button>
+                     <button className="dropdown-item" onClick={() => alert('Ảnh không nằm trong thùng rác.')} >
+                       <span className="left-sidebar-title">Chuyển khỏi thùng rác</span>
+                    </button>
+                   </div>
+                 )}
+               </div>
              </div>
            </div>
          )}
@@ -233,6 +333,55 @@ export default function Screenshots() {
           <button className="fab" title="Upload screenshots" onClick={onUploadClick}><i className="las la-plus" /></button>
           <input ref={uploadRef} type="file" accept="image/*" multiple style={{ display: 'none' }} onChange={onUploadChange} />
       </div>
+
+      {/* Album Modal */}
+      {showAlbumModal && (
+        <div className="album-modal-overlay" onClick={() => setShowAlbumModal(false)}>
+          <div className="album-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="album-modal-header">
+              <h1>Thêm vào</h1>
+              <button className="album-modal-close" onClick={() => setShowAlbumModal(false)}>
+                <i className="las la-times" />
+              </button>
+            </div>
+            
+            <button className="album-create-new-btn">
+              <i className="las la-plus-circle" />
+              <span>Album mới</span>
+            </button>
+
+            <div className="album-list">
+              {loadingAlbums ? (
+                <div className="album-loading">Đang tải...</div>
+              ) : albums.length === 0 ? (
+                <div className="album-empty">Bạn chưa có album nào</div>
+              ) : (
+                albums.map(album => (
+                  <div key={album.id} className="album-item" onClick={() => alert(`Thêm vào album: ${album.title}`)}>
+                    <div className="album-cover">
+                      {album.cover_url ? (
+                        <img src={album.cover_url} alt={album.title} />
+                      ) : (
+                        <div className="album-no-cover">
+                          <i className="las la-images" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="album-info">
+                      <div className="album-title">{album.title}</div>
+                      <div className="album-meta">
+                        <span>{album.created_at}</span>
+                        <span className="album-separator">•</span>
+                        <span>{album.photos_count} mục</span>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Lightbox Modal - Completely outside for true fullscreen */}
       {currentPhotoIndex !== null && (

@@ -147,4 +147,57 @@ class Photo extends Model
             ? asset('storage/' . $this->thumbnail_path)
             : $this->url;
     }
+
+    /**
+     * Get the number of days remaining before permanent deletion.
+     * Returns null if photo is not deleted.
+     * Returns 0 if deletion date has passed.
+     */
+    public function getDaysRemainingAttribute()
+    {
+        if (!$this->deleted_at) {
+            return null;
+        }
+
+        $deletionDate = $this->deleted_at->addDays(60);
+        $daysRemaining = now()->diffInDays($deletionDate, false);
+
+        return max(0, (int) $daysRemaining);
+    }
+
+    /**
+     * Check if photo will be permanently deleted soon (less than 7 days).
+     */
+    public function getIsExpiringSoonAttribute()
+    {
+        return $this->days_remaining !== null && $this->days_remaining <= 7 && $this->days_remaining > 0;
+    }
+
+    /**
+     * Check if photo has expired (past 60 days).
+     */
+    public function getIsExpiredAttribute()
+    {
+        return $this->days_remaining !== null && $this->days_remaining === 0;
+    }
+
+    /**
+     * Get formatted expiration message.
+     */
+    public function getExpirationMessageAttribute()
+    {
+        if (!$this->deleted_at) {
+            return null;
+        }
+
+        if ($this->is_expired) {
+            return 'Sẽ bị xóa vĩnh viễn hôm nay';
+        }
+
+        if ($this->is_expiring_soon) {
+            return "Còn {$this->days_remaining} ngày";
+        }
+
+        return "Còn {$this->days_remaining} ngày";
+    }
 }

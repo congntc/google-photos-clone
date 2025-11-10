@@ -4,20 +4,47 @@ import { PageProps } from '@/types';
 import '../assets/css/page-google-photos.css';
 import '../assets/css/favourites-page.css';
 
-// Import sample images
-import img01 from '../assets/images/page-img/01.jpg';
-import img02 from '../assets/images/page-img/02.jpg';
-import img03 from '../assets/images/page-img/03.jpg';
-import img07 from '../assets/images/page-img/07.jpg';
-import img08 from '../assets/images/page-img/08.jpg';
-
-interface FavouriteItem {
+interface PhotoItem {
   id: number;
   url: string;
+  thumbnail_url?: string;
   date: string;
   month: string;
   year: string;
+  type: 'image' | 'video';
+  mime_type: string;
+  is_favorite: boolean;
+  original_filename: string;
+  file_size: number;
+  width?: number;
+  height?: number;
+  durationSec?: number;
 }
+
+interface AlbumItem {
+  id: number;
+  title: string;
+  description?: string;
+  photos_count: number;
+  cover_url?: string;
+  created_at: string;
+}
+
+interface FavouritesPageProps extends PageProps {
+  photos: PhotoItem[];
+}
+
+// mm:ss or h:mm:ss
+const formatDuration = (seconds?: number) => {
+  if (seconds == null || isNaN(seconds)) return '';
+  const s = Math.max(0, Math.floor(seconds));
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+  const mm = h > 0 ? String(m).padStart(2, '0') : String(m);
+  const ss = String(sec).padStart(2, '0');
+  return h > 0 ? `${h}:${mm}:${ss}` : `${mm}:${ss}`;
+};
 
 // Helper to inject external icon fonts
 const ensureIconCss = (): void => {
@@ -36,24 +63,25 @@ const ensureIconCss = (): void => {
   });
 };
 
-export default function Favourites() {
+export default function Favourites({ photos: initialPhotos = [], auth }: FavouritesPageProps) {
   // Load icon fonts on mount
   useEffect(() => {
     ensureIconCss();
   }, []);
-  // Favourites with realistic dates
-  const [favourites, setFavourites] = useState<FavouriteItem[]>([
-    // Thứ 2, 6 tháng 10
-    { id: 1, url: img01, date: '2025-10-06', month: 'October 2025', year: '2025' },
-    { id: 2, url: img02, date: '2025-10-06', month: 'October 2025', year: '2025' },
-    { id: 3, url: img03, date: '2025-10-06', month: 'October 2025', year: '2025' },
-  ]);
-  const [favoriteIds, setFavoriteIds] = useState(() => new Set());
-  const [selectedIds, setSelectedIds] = useState(() => new Set());
+  
+  const [photos, setPhotos] = useState<PhotoItem[]>(initialPhotos);
+  const [videoDurations, setVideoDurations] = useState<Record<number, number>>({});
+  const [favoriteIds, setFavoriteIds] = useState(() => new Set(initialPhotos.filter(p => p.is_favorite).map(p => p.id)));
+  const [selectedIds, setSelectedIds] = useState(() => new Set<number>());
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState<number | null>(null);
   const [zoomLevel, setZoomLevel] = useState(100);
-  const [searchQuery, setSearchQuery] = useState('');
-  const uploadRef = useRef(null);
+  const uploadRef = useRef<HTMLInputElement | null>(null);
+  const [showOptionsMenu, setShowOptionsMenu] = useState(false);
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
+  const [showAlbumModal, setShowAlbumModal] = useState(false);
+  const [albums, setAlbums] = useState<AlbumItem[]>([]);
+  const [loadingAlbums, setLoadingAlbums] = useState(false);
+
 
   const onToggleFavorite = useCallback((id) => {
     setFavoriteIds((prev) => {
@@ -71,34 +99,83 @@ export default function Favourites() {
     });
   }, []);
 
-  const onUploadClick = useCallback(() => uploadRef.current?.click(), []);
-
-  const onUploadChange = useCallback((e: any) => {
-    const files = Array.from(e.target.files || []) as File[];
-    if (!files.length) return;
-
-    const now = new Date();
-    const year = String(now.getFullYear());
-    const monthName = now.toLocaleString('en-US', { month: 'long' }) + ' ' + year;
-    const dateStr = now.toISOString().slice(0, 10);
-
-    const newFavourites = files.map((file: File, idx: number) => ({
-      id: Date.now() + idx,
-      url: URL.createObjectURL(file),
-      date: dateStr,
-      month: monthName,
-      year,
-    }));
-
-    setFavourites((prev) => [...newFavourites, ...prev]);
-    e.target.value = '';
+  // Xử lý toggle favorite
+  const handleToggleFavorite = useCallback((ids: number[], isFavorite: boolean) => {
+    fetch('/photos/toggle-favorite', {
+      method: 'POST',
+      headers: {
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({ ids, is_favorite: isFavorite }),
+    })
+      .then(async response => {
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.message || 'Lỗi khi cập nhật');
+        }
+        
+        if (data.success) {
+          // Xóa khỏi danh sách favorites nếu bỏ yêu thích
+          if (!isFavorite) {
+            setPhotos(prevPhotos => prevPhotos.filter(p => !ids.includes(p.id)));
+          } else {
+            // Cập nhật state
+            setPhotos(prevPhotos => 
+              prevPhotos.map(p => 
+                ids.includes(p.id) ? { ...p, is_favorite: isFavorite } : p
+              )
+            );
+          }
+          
+          // Cập nhật favoriteIds
+          setFavoriteIds(prev => {
+            const next = new Set(prev);
+            if (isFavorite) {
+              ids.forEach(id => next.add(id));
+            } else {
+              ids.forEach(id => next.delete(id));
+            }
+            return next;
+          });
+          
+          // Xóa selection
+          setSelectedIds(new Set());
+        } else {
+          throw new Error(data.message || 'Lỗi khi cập nhật');
+        }
+      })
+      .catch(error => {
+        console.error('Toggle favorite error:', error);
+        alert(error.message || 'Lỗi khi cập nhật. Vui lòng thử lại!');
+      });
   }, []);
 
+  // Xử lý toggle favorite từ selection toolbar
+  const handleToggleFavoriteSelected = useCallback(() => {
+    if (selectedIds.size === 0) return;
+    
+    const ids = Array.from(selectedIds);
+    // Bỏ yêu thích (vì đây là trang Favourites)
+    handleToggleFavorite(ids, false);
+  }, [selectedIds, handleToggleFavorite]);
+
+  // Xử lý toggle favorite từ lightbox
+  const handleLightboxToggleFavorite = useCallback(() => {
+    if (currentPhotoIndex === null) return;
+    
+    const photo = photos[currentPhotoIndex];
+    handleToggleFavorite([photo.id], !photo.is_favorite);
+  }, [currentPhotoIndex, photos, handleToggleFavorite]);
+
   // Helper to format date headers
-  const getDateLabel = (dateStr) => {
+  const getDateLabel = (dateStr: string) => {
     const photoDate = new Date(dateStr);
-    const today = new Date('2025-11-07');
-    const yesterday = new Date('2025-11-06');
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
     
     photoDate.setHours(0, 0, 0, 0);
     today.setHours(0, 0, 0, 0);
@@ -112,50 +189,125 @@ export default function Favourites() {
       const dayOfWeek = ['CN', 'Th 2', 'Th 3', 'Th 4', 'Th 5', 'Th 6', 'Th 7'][photoDate.getDay()];
       const day = photoDate.getDate();
       const month = photoDate.getMonth() + 1;
-      return `${dayOfWeek}, ${day} thg ${month}`;
+      const year = photoDate.getFullYear();
+      return `${dayOfWeek}, ${day} thg ${month} ${year}`;
     }
   };
 
-  // Group favourites by date and render
+  // Group photos by date and render
   const renderedItems = useMemo(() => {
     const out = [];
     let currentDateLabel = '';
     
-    favourites.forEach((s) => {
-      const dateLabel = getDateLabel(s.date);
+    photos.forEach((p) => {
+      const dateLabel = getDateLabel(p.date);
       
       if (dateLabel !== currentDateLabel) {
         out.push(
-          <div key={`date-${s.date}-${out.length}`} className="date-divider">
+          <div key={`date-${p.date}-${out.length}`} className="date-divider">
             {dateLabel}
           </div>
         );
         currentDateLabel = dateLabel;
       }
       
-      const favouriteIndex = favourites.findIndex(favourite => favourite.id === s.id);
+      const photoIndex = photos.findIndex(photo => photo.id === p.id);
       out.push(
-        <div key={s.id} className="photo-item" onClick={(e: any) => {
-          if ((e.target as HTMLElement).closest('.photo-favorite')) return;
+        <div key={p.id} className="photo-item" onClick={(e: any) => {
           if ((e.target as HTMLElement).closest('.photo-select')) return;
-          setCurrentPhotoIndex(favouriteIndex);
+          setCurrentPhotoIndex(photoIndex);
           setZoomLevel(100);
         }}>
-          <img src={s.url} alt={`favourite ${s.id}`} loading="lazy" onError={(e) => { e.currentTarget.src = `https://picsum.photos/400/300?random=${s.id}`; }} />
+          {p.type === 'video' ? (
+            <>
+              <video
+                src={p.url}
+                muted
+                loop
+                preload="metadata"
+                onMouseEnter={(e) => {
+                  const video = e.currentTarget;
+                  video.play().catch(() => {});
+                }}
+                onMouseLeave={(e) => {
+                  const video = e.currentTarget;
+                  video.pause();
+                  video.currentTime = 0;
+                }}
+                onLoadedMetadata={(ev) => {
+                  const vid = ev.currentTarget as HTMLVideoElement;
+                  if (!isNaN(vid.duration)) {
+                    setVideoDurations((prev) => ({ ...prev, [p.id]: Math.floor(vid.duration) }));
+                  }
+                }}
+                style={{ width: '100%', height: '100%', display: 'block', objectFit: 'cover' }}
+              />
+              <div className="video-duration-overlay">
+                {formatDuration(p.durationSec ?? videoDurations[p.id])}
+              </div>
+            </>
+          ) : (
+            <img src={p.thumbnail_url || p.url} alt={`Photo ${p.id}`} loading="lazy" onError={(e) => { (e.currentTarget as HTMLImageElement).src = `https://picsum.photos/400/300?random=${p.id}`; }} />
+          )}
           <div className="photo-info">
-            <div className="photo-date">{s.date}</div>
-            <button type="button" className={`photo-select${selectedIds.has(s.id) ? ' active' : ''}`} onClick={() => onToggleSelect(s.id)} aria-label="Toggle select">
+            <div className="photo-date">{p.date}</div>
+            <button type="button" className={`photo-select${selectedIds.has(p.id) ? ' active' : ''}`} onClick={() => onToggleSelect(p.id)} aria-label="Toggle select">
               <i className="las la-check" />
-            </button>
-            <button type="button" className={`photo-favorite${favoriteIds.has(s.id) ? ' active' : ''}`} onClick={() => onToggleFavorite(s.id)} aria-label="Toggle favorite">
-              <i className="las la-heart" />
             </button>
           </div>
         </div>
       );
     });
     return out;
-  }, [favourites, favoriteIds, selectedIds, onToggleFavorite, onToggleSelect]);
+  }, [photos, selectedIds, onToggleSelect, videoDurations]);
+  // Xử lý xóa ảnh
+  
+    // Xử lý tải xuống ảnh
+    const onDownloadSelected = useCallback(() => {
+      if (selectedIds.size === 0) return;
+      
+      const ids = Array.from(selectedIds);
+      
+      // Download từng ảnh
+      ids.forEach(id => {
+        const link = document.createElement('a');
+        link.href = `/photos/${id}/download`;
+        link.download = '';
+        link.click();
+      });
+    }, [selectedIds]);
+   // Mở modal album và tải danh sách albums
+    const handleOpenAlbumModal = useCallback(() => {
+      setShowAlbumModal(true);
+      setLoadingAlbums(true);
+      
+      fetch('/api/albums/user', {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+        },
+      })
+        .then(async response => {
+          const data = await response.json();
+          
+          if (!response.ok) {
+            throw new Error(data.message || 'Lỗi khi tải albums');
+          }
+          
+          if (data.success) {
+            setAlbums(data.albums || []);
+          } else {
+            throw new Error(data.message || 'Lỗi khi tải albums');
+          }
+        })
+        .catch(error => {
+          console.error('Load albums error:', error);
+          alert(error.message || 'Lỗi khi tải danh sách albums!');
+        })
+        .finally(() => {
+          setLoadingAlbums(false);
+        });
+    }, []);
 
   return (
     <>
@@ -176,16 +328,15 @@ export default function Favourites() {
                   type="text"
                   className="search-input"
                   placeholder="Ảnh yêu thích"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  readOnly
                 />
               </div>
             </div>
 
             <button 
               className="close-button"
-              onClick={() => setSearchQuery('')}
-              aria-label="Đóng tìm kiếm"
+              onClick={() => window.location.href = '/photos'}
+              aria-label="Đóng"
             >
               <i className="las la-times" />
             </button>
@@ -202,35 +353,116 @@ export default function Favourites() {
                </button>
                <span className="selection-count">{selectedIds.size} đã chọn</span>
              </div>
-             <div className="toolbar-actions">
-               <button className="toolbar-btn" title="Xóa">
-                 <i className="las la-trash" />
-                 <span>Xóa</span>
-               </button>
-               <button className="toolbar-btn" title="Thêm vào album">
-                 <i className="las la-folder-plus" />
-                 <span>Thêm vào album</span>
-               </button>
-               <button className="toolbar-btn" title="Tạo album mới">
-                 <i className="las la-plus-circle" />
-                 <span>Tạo album mới</span>
-               </button>
+              <div className="toolbar-actions">
+                <button className="toolbar-btn" onClick={() => handleToggleFavoriteSelected()} title="Bỏ yêu thích">
+                  <i className="las la-heart-broken" />
+                </button>
+                <div className="toolbar-menu-wrapper" style={{ position: 'relative', display: 'inline-block' }}>
+                  <button className="toolbar-btn" title="Tùy chọn khác" onClick={() => setShowOptionsMenu(m => !m)}>
+                    <i className="las la-plus-circle" />
+                  </button>
+                  {showOptionsMenu && (
+                    <div className="toolbar-dropdown" style={{ position: 'absolute', right: 0, top: '100%', background: '#fff', border: '1px solid #ddd', borderRadius: 6, padding: 8, minWidth: 200, boxShadow: '0 4px 12px rgba(0,0,0,0.15)', zIndex: 50 }}>
+                      <button className="dropdown-item" onClick={handleOpenAlbumModal} >
+                          <i className="las la-book" />
+                          <span className="left-sidebar-title">Album</span>
+                      </button>
+                      <button className="dropdown-item" onClick={() => alert('Album chia sẻ.')} >
+                          <i className="las la-user-friends" />
+                          <span className="left-sidebar-title">Album chia sẻ</span>
+                      </button>
+                      <button className="dropdown-item" onClick={() => alert('Tài liệu')} >
+                          <i className="las la-file-alt" />
+                          <span className="left-sidebar-title">Tài liệu</span>
+                      </button>
+                    </div>
+                  )}
+               </div>
                <button className="toolbar-btn" title="Chia sẻ">
-                 <i className="las la-share-alt" />
-                 <span>Chia sẻ</span>
+                 <i className="fa-solid fa-share-nodes"></i>
                </button>
+               <div className="toolbar-menu-wrapper" style={{ position: 'relative', display: 'inline-block' }}>
+                 <button className="toolbar-btn" title="Tùy chọn khác" onClick={() => setShowMoreMenu(m => !m)}>
+                   <i className="fa-solid fa-ellipsis-vertical"></i>
+                 </button>
+                 {showMoreMenu && (
+                   <div className="toolbar-dropdown" style={{ position: 'absolute', right: 0, top: '100%', background: '#fff', border: '1px solid #ddd', borderRadius: 6, padding: 8, minWidth: 200, boxShadow: '0 4px 12px rgba(0,0,0,0.15)', zIndex: 50 }}>
+                     <button className="dropdown-item" onClick={onDownloadSelected} >
+                       <span className="left-sidebar-title">Tải xuống</span>
+                    </button>
+                     <button className="dropdown-item" onClick={() => alert('Sẽ thêm chỉnh sửa ngày & giờ.')} >
+                       <span className="left-sidebar-title">Chỉnh sửa ngày & giờ</span>
+                    </button>
+                     <button className="dropdown-item" onClick={() => alert('Sẽ thêm chỉnh sửa vị trí.')} >
+                       <span className="left-sidebar-title">Chỉnh sửa vị trí</span>
+                    </button>
+                   </div>
+                 )}
+               </div>
              </div>
            </div>
          )}
          
          <div className="photo-grid" id="photoGrid">
-            {renderedItems}
+            {photos.length === 0 ? (
+              <div className="empty-state">
+                <i className="las la-heart" style={{ fontSize: '4rem', color: '#ccc' }} />
+                <p>Chưa có ảnh/video yêu thích nào</p>
+              </div>
+            ) : (
+              renderedItems
+            )}
           </div>
-
-          {/* Floating Action Button + Hidden Input */}
-          <button className="fab" title="Upload favourites" onClick={onUploadClick}><i className="las la-plus" /></button>
-          <input ref={uploadRef} type="file" accept="image/*" multiple style={{ display: 'none' }} onChange={onUploadChange} />
         </div>
+
+         {/* Album Modal */}  
+          {showAlbumModal && (
+            <div className="album-modal-overlay" onClick={() => setShowAlbumModal(false)}>
+              <div className="album-modal-content" onClick={(e) => e.stopPropagation()}>
+                <div className="album-modal-header">
+                  <h1>Thêm vào</h1>
+                  <button className="album-modal-close" onClick={() => setShowAlbumModal(false)}>
+                    <i className="las la-times" />
+                  </button>
+                </div>
+                
+                <button className="album-create-new-btn">
+                  <i className="las la-plus-circle" />
+                  <span>Album mới</span>
+                </button>
+
+                <div className="album-list">
+                  {loadingAlbums ? (
+                    <div className="album-loading">Đang tải...</div>
+                  ) : albums.length === 0 ? (
+                    <div className="album-empty">Bạn chưa có album nào</div>
+                  ) : (
+                    albums.map(album => (
+                      <div key={album.id} className="album-item" onClick={() => alert(`Thêm vào album: ${album.title}`)}>
+                        <div className="album-cover">
+                          {album.cover_url ? (
+                            <img src={album.cover_url} alt={album.title} />
+                          ) : (
+                            <div className="album-no-cover">
+                              <i className="las la-images" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="album-info">
+                          <div className="album-title">{album.title}</div>
+                          <div className="album-meta">
+                            <span>{album.created_at}</span>
+                            <span className="album-separator">•</span>
+                            <span>{album.photos_count} mục</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
 
         {/* Lightbox Modal - Completely outside for true fullscreen */}
         {currentPhotoIndex !== null && (
@@ -242,7 +474,7 @@ export default function Favourites() {
                   <i className="las la-arrow-left" />
                 </button>
                 <div className="lightbox-counter">
-                  {currentPhotoIndex + 1} / {favourites.length}
+                  {currentPhotoIndex + 1} / {photos.length}
                 </div>
               </div>
               <div className="lightbox-topbar-right">
@@ -259,11 +491,12 @@ export default function Favourites() {
                 <button className="lightbox-btn" title="Tải xuống">
                   <i className="las la-download" />
                 </button>
-                <button className="lightbox-btn lightbox-btn-favorite" title="Yêu thích">
-                  <i className="las la-heart" />
-                </button>
-                <button className="lightbox-btn lightbox-btn-delete" title="Xóa">
-                  <i className="las la-trash" />
+                <button 
+                  className={`lightbox-btn lightbox-btn-favorite${photos[currentPhotoIndex].is_favorite ? ' active' : ''}`} 
+                  onClick={handleLightboxToggleFavorite}
+                  title={photos[currentPhotoIndex].is_favorite ? "Bỏ yêu thích" : "Yêu thích"}
+                >
+                  <i className={photos[currentPhotoIndex].is_favorite ? "las la-heart" : "lar la-heart"} />
                 </button>
                 <button className="lightbox-btn" onClick={() => setCurrentPhotoIndex(null)} title="Đóng">
                   <i className="las la-times" />
@@ -277,25 +510,40 @@ export default function Favourites() {
                 <i className="las la-angle-left" />
               </button>
             )}
-            {currentPhotoIndex < favourites.length - 1 && (
+            {currentPhotoIndex < photos.length - 1 && (
               <button className="lightbox-nav lightbox-nav-next" onClick={() => { setCurrentPhotoIndex(currentPhotoIndex + 1); setZoomLevel(100); }}>
                 <i className="las la-angle-right" />
               </button>
             )}
 
-            {/* Image Container */}
+            {/* Image/Video Container */}
             <div className="lightbox-content">
-              <img 
-                src={favourites[currentPhotoIndex].url} 
-                alt={`favourite ${favourites[currentPhotoIndex].id}`}
-                style={{ 
-                  transform: `scale(${zoomLevel / 100})`,
-                  maxWidth: '100%',
-                  maxHeight: '100%',
-                  objectFit: 'contain',
-                  transition: 'transform 0.2s ease'
-                }}
-              />
+              {photos[currentPhotoIndex].type === 'video' ? (
+                <video
+                  src={photos[currentPhotoIndex].url}
+                  controls
+                  autoPlay
+                  style={{
+                    transform: `scale(${zoomLevel / 100})`,
+                    maxWidth: '100%',
+                    maxHeight: '100%',
+                    objectFit: 'contain',
+                    transition: 'transform 0.2s ease'
+                  }}
+                />
+              ) : (
+                <img 
+                  src={photos[currentPhotoIndex].url} 
+                  alt={`Photo ${photos[currentPhotoIndex].id}`}
+                  style={{ 
+                    transform: `scale(${zoomLevel / 100})`,
+                    maxWidth: '100%',
+                    maxHeight: '100%',
+                    objectFit: 'contain',
+                    transition: 'transform 0.2s ease'
+                  }}
+                />
+              )}
             </div>
           </div>
         )}
