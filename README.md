@@ -22,15 +22,15 @@
 
 ### 🗂️ Tổ chức & Phân loại
 - ✅ **Albums**: Tạo và quản lý album ảnh
-- ✅ **Tags**: Gắn thẻ để dễ dàng tìm kiếm
-- ✅ **People Recognition**: Nhận diện và gắn tên người trong ảnh
+- ❌ **Tags**: Gắn thẻ để dễ dàng tìm kiếm
+- ❌ **People Recognition**: Nhận diện và gắn tên người trong ảnh
 - ✅ **Favorites**: Đánh dấu ảnh yêu thích
-- ✅ **Archive**: Lưu trữ ảnh không muốn hiển thị thường xuyên
+- ❌ **Archive**: Lưu trữ ảnh không muốn hiển thị thường xuyên
 
 ### 🔍 Tìm kiếm & Lọc
-- ✅ **Tìm kiếm nâng cao**: Theo tên file, tags, người, địa điểm
-- ✅ **Lọc theo thời gian**: Ngày, tháng, năm
-- ✅ **Lọc theo loại**: Ảnh, video, ảnh yêu thích
+- ❌ **Tìm kiếm nâng cao**: Theo tên file, tags, người, địa điểm
+- ❌ **Lọc theo thời gian**: Ngày, tháng, năm
+- ❌ **Lọc theo loại**: Ảnh, video, ảnh yêu thích
 
 ### 🗑️ Thùng rác (Trash Bin)
 - ✅ **Soft Delete**: Ảnh bị xóa sẽ vào thùng rác (giữ 60 ngày)
@@ -40,13 +40,13 @@
 - ✅ **Expiration Badges**: Hiển thị thời gian còn lại với màu cảnh báo
 
 ### 🤝 Chia sẻ & Cộng tác
-- ✅ **Share Albums**: Chia sẻ album với người khác
-- ✅ **Permissions**: Phân quyền xem/chỉnh sửa
-- ✅ **Friendship System**: Kết bạn với người dùng khác
-- ✅ **Notifications**: Thông báo khi có hoạt động mới
+- ❌ **Share Albums**: Chia sẻ album với người khác
+- ❌ **Permissions**: Phân quyền xem/chỉnh sửa
+- ❌ **Friendship System**: Kết bạn với người dùng khác
+- ❌ **Notifications**: Thông báo khi có hoạt động mới
 
 ### 🎨 Giao diện
-- ✅ **Responsive Design**: Tương thích mọi thiết bị
+- ❌ **Responsive Design**: Tương thích mọi thiết bị
 - ✅ **Grid Layout**: Lưới ảnh linh hoạt như Google Photos
 - ✅ **Date Dividers**: Phân chia theo ngày tháng năm
 - ✅ **Selection Mode**: Chọn nhiều ảnh để thực hiện hàng loạt
