@@ -50,6 +50,24 @@ export default function Screenshots() {
   useEffect(() => {
     ensureIconCss();
   }, []);
+
+  // Reset body overflow when component mounts (fix scrollbar issue when navigating from other pages)
+  useEffect(() => {
+    // Add class to body to enable CSS override
+    document.body.classList.add('screenshots-page-body');
+    
+    // Force reset overflow on both html and body
+    document.documentElement.style.overflow = 'auto';
+    document.body.style.overflow = 'auto';
+    document.documentElement.style.height = 'auto';
+    document.body.style.height = 'auto';
+    
+    return () => {
+      // Remove class on unmount
+      document.body.classList.remove('screenshots-page-body');
+    };
+  }, []);
+
   // Screenshots with realistic dates
   const [screenshots, setScreenshots] = useState<ScreenshotItem[]>([
     // Hôm nay (7/11/2025)

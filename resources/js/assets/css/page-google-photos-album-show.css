@@ -1,3 +1,10 @@
+/* Force reset overflow from other pages using body class */
+body.album-show-page-body,
+html:has(body.album-show-page-body) {
+  overflow: auto !important;
+  height: auto !important;
+}
+
 .albumshow-container.standalone {
   position: fixed;
   top: 0;

@@ -18,6 +18,23 @@ interface Props {
 }
 
 export default function AlbumAddSelect({ album, photos: initialPhotos = [] }: Props) {
+  // Reset body overflow when component mounts (fix scrollbar issue when navigating from other pages)
+  useEffect(() => {
+    // Add class to body to enable CSS override
+    document.body.classList.add('album-add-select-page-body');
+    
+    // Force reset overflow on both html and body
+    document.documentElement.style.overflow = 'auto';
+    document.body.style.overflow = 'auto';
+    document.documentElement.style.height = 'auto';
+    document.body.style.height = 'auto';
+    
+    return () => {
+      // Remove class on unmount
+      document.body.classList.remove('album-add-select-page-body');
+    };
+  }, []);
+
   const [photos, setPhotos] = useState<PhotoItem[]>(initialPhotos);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const uploadRef = useRef<HTMLInputElement | null>(null);

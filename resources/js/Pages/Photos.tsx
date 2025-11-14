@@ -63,22 +63,6 @@ export default function PageGooglePhotos({ photos: initialPhotos = [], auth }: P
   console.log('Auth user:', auth?.user);
   console.log('Photos count:', photos.length);
 
-  const onToggleFavorite = useCallback((id) => {
-    setFavoriteIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
-      return next;
-    });
-  }, []);
-
-  const onToggleSelect = useCallback((id) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
-      return next;
-    });
-  }, []);
-
   // Xử lý thêm/bỏ yêu thích
   const handleToggleFavorite = useCallback((ids: number[], isFavorite: boolean) => {
     fetch('/photos/toggle-favorite', {
@@ -126,6 +110,21 @@ export default function PageGooglePhotos({ photos: initialPhotos = [], auth }: P
         console.error('Toggle favorite error:', error);
         alert(error.message || 'Lỗi khi cập nhật. Vui lòng thử lại!');
       });
+  }, []);
+
+  const onToggleFavorite = useCallback((id) => {
+    // Check current favorite status
+    const isFavorite = favoriteIds.has(id);
+    // Toggle to opposite state
+    handleToggleFavorite([id], !isFavorite);
+  }, [favoriteIds, handleToggleFavorite]);
+
+  const onToggleSelect = useCallback((id) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
   }, []);
 
   // Xử lý toggle favorite từ selection toolbar
@@ -441,6 +440,9 @@ export default function PageGooglePhotos({ photos: initialPhotos = [], auth }: P
             <div className="photo-date">{p.date}</div>
             <button type="button" className={`photo-select${selectedIds.has(p.id) ? ' active' : ''}`} onClick={() => onToggleSelect(p.id)} aria-label="Toggle select">
               <i className="las la-check" />
+            </button>
+            <button type="button" className={`photo-favorite${favoriteIds.has(p.id) ? ' active' : ''}`} onClick={() => onToggleFavorite(p.id)} aria-label="Toggle favorite">
+              <i className="las la-heart" />
             </button>
           </div>
         </div>

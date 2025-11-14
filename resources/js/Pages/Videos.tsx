@@ -39,6 +39,23 @@ const ensureIconCss = (): void => {
 export default function Videos() {
   useEffect(() => { ensureIconCss(); }, []);
 
+  // Reset body overflow when component mounts (fix scrollbar issue when navigating from other pages)
+  useEffect(() => {
+    // Add class to body to enable CSS override
+    document.body.classList.add('videos-page-body');
+    
+    // Force reset overflow on both html and body
+    document.documentElement.style.overflow = 'auto';
+    document.body.style.overflow = 'auto';
+    document.documentElement.style.height = 'auto';
+    document.body.style.height = 'auto';
+    
+    return () => {
+      // Remove class on unmount
+      document.body.classList.remove('videos-page-body');
+    };
+  }, []);
+
   // Data (flexbox-friendly images; treat as demo video thumbnails)
   const [videos, setVideos] = useState<VideoItem[]>([
     { id: 1, url: img01, date: '2025-11-07', month: 'November 2025', year: '2025', duration: '0:07' },
@@ -134,14 +151,13 @@ export default function Videos() {
         }}>
           <img src={v.url} alt={`video ${v.id}`} loading="lazy" onError={(e) => { e.currentTarget.src = `https://picsum.photos/400/300?random=${v.id}`; }} />
           <div className="photo-info">
-            <div className="video-duration">{v.duration || '0:00'}</div>
-            <button 
-              type="button" 
-              className={`photo-select${selectedIds.has(v.id) || selectedIds.size > 0 ? ' visible' : ''}${selectedIds.has(v.id) ? ' active' : ''}`} 
-              onClick={(e) => { e.stopPropagation(); onToggleSelect(v.id); }} 
-              aria-label="Toggle select"
-            >
+           
+            <div className="photo-date"></div>
+            <button type="button" className="photo-select" aria-label="Toggle select">
               <i className="las la-check" />
+            </button>
+            <button type="button" className="photo-favorite" aria-label="Toggle favorite">
+              <i className="las la-heart" />
             </button>
           </div>
         </div>

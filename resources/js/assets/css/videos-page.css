@@ -1,3 +1,10 @@
+/* Force reset overflow from other pages using body class */
+body.videos-page-body,
+html:has(body.videos-page-body) {
+  overflow: auto !important;
+  height: auto !important;
+}
+
 /* Videos Page Styles */
 .videos-page {
   min-height: 100vh;
@@ -111,28 +118,7 @@
   color: #5f6368;
 }
 
-/* Video duration overlay (top-right corner) - Always visible */
-.video-duration {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  background: rgba(0, 0, 0, 0.7);
-  color: #fff;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 500;
-  pointer-events: none;
-  z-index: 10;
-  opacity: 1 !important;
-  display: block !important;
-}
 
-/* Override photo-info opacity for video items to show duration */
-.video-item .photo-info {
-  opacity: 1 !important;
-  background: transparent !important;
-}
 
 /* Photo select button - show when any item selected */
 .photo-select {
@@ -140,10 +126,6 @@
   transition: opacity 0.2s, background 0.2s;
 }
 
-.photo-item:hover .photo-select,
-.photo-select.visible {
-  opacity: 1;
-}
 
 .header-info { flex: 1; }
 
@@ -152,17 +134,6 @@
   font-weight: 400;
   color: #202124;
   margin: 0 0 8px 0;
-}
-
-/* Blue album badge (like Screenshots page) */
-.album-badge {
-  display: inline-block;
-  padding: 4px 12px;
-  background: #e8f0fe;
-  color: #1967d2;
-  font-size: 13px;
-  border-radius: 12px;
-  font-weight: 500;
 }
 
 /* Container */
@@ -174,20 +145,6 @@
 }
 
 
-
-/* Selection toolbar overrides to cover header */
-.videos-container .selection-toolbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 101;
-  margin: 0;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.videos-container .photo-grid { padding-top: 24px; }
-.videos-container.has-selection-toolbar .photo-grid { padding-top: 80px; }
 
 /* Responsive */
 @media (max-width: 768px) {

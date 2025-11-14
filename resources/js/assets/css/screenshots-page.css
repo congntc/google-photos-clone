@@ -1,3 +1,10 @@
+/* Force reset overflow from other pages using body class */
+body.screenshots-page-body,
+html:has(body.screenshots-page-body) {
+  overflow: auto !important;
+  height: auto !important;
+}
+
 /* Screenshots Page Styles */
 .screenshots-page {
   min-height: 100vh;

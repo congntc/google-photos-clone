@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState, useEffect } from 'react';
 import { router } from '@inertiajs/react';
 import '../assets/css/page-google-photos.css';
 import '../assets/css/page-google-photos-album-show.css';
@@ -22,6 +22,23 @@ interface AlbumItem {
 }
 
 export default function AlbumShow({ album, photos }: AlbumShowProps) {
+  // Reset body overflow when component mounts (fix scrollbar issue when navigating from other pages)
+  useEffect(() => {
+    // Add class to body to enable CSS override
+    document.body.classList.add('album-show-page-body');
+    
+    // Force reset overflow on both html and body
+    document.documentElement.style.overflow = 'auto';
+    document.body.style.overflow = 'auto';
+    document.documentElement.style.height = 'auto';
+    document.body.style.height = 'auto';
+    
+    return () => {
+      // Remove class on unmount
+      document.body.classList.remove('album-show-page-body');
+    };
+  }, []);
+
   // Local state so uploads append immediately on client
   const [photoItems, setPhotoItems] = useState(photos);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState<number | null>(null);

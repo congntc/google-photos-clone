@@ -1,7 +1,27 @@
-/* Favourites Page Styles */
+/* Force reset overflow from other pages using body class */
+body.favourites-page-body,
+body.album-create-select-page-body,
+body.album-add-select-page-body,
+body.album-create-page-body,
+html:has(body.favourites-page-body),
+html:has(body.album-create-select-page-body),
+html:has(body.album-add-select-page-body),
+html:has(body.album-create-page-body) {
+  overflow: hidden !important;
+  height: 100% !important;
+}
+
+/* Favourites Page Styles - Fixed container */
 .favourites-page {
-  min-height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: #fff;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 /* Header */
@@ -9,15 +29,8 @@
   background: #fff;
   border-bottom: 1px solid #e0e0e0;
   padding: 16px 24px;
-  position: sticky;
-  top: 0;
+  flex-shrink: 0;
   z-index: 99;
-  transition: z-index 0s 0.3s;
-}
-
-.favourites-page.has-selection .favourites-header {
-  z-index: 98;
-  transition: none;
 }
 
 .favourites-header-content {
@@ -216,32 +229,34 @@
   .header-actions .action-done { height:36px; padding:0 14px; font-size:13px; }
 }
 
-/* Container */
+/* Container - Scrollable area */
 .favourites-container {
-  max-width: 100%;
-  margin: 0 auto;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding: 24px;
   padding-top: 0;
 }
 
 /* Reuse selection toolbar from photos */
 .favourites-container .selection-toolbar {
-  position: fixed;
+  position: sticky;
   top: 0;
   left: 0;
   right: 0;
-  z-index: 101;
-  margin: 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 500;
+  margin: 0 -24px 24px -24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .favourites-container .photo-grid {
   padding-top: 24px;
 }
 
-.favourites-container.has-selection-toolbar .photo-grid {
+/* Remove this rule as selection toolbar is now sticky within container */
+/* .favourites-container.has-selection-toolbar .photo-grid {
   padding-top: 80px;
-}
+} */
 
 /* Responsive */
 @media (max-width: 768px) {

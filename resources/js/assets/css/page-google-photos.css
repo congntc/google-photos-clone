@@ -245,17 +245,17 @@
     opacity: 1;
   }
   
-  /* Hide per-photo date badge by default to match Google Photos */
-  .photo-date{ position:absolute; bottom:6px; left:12px; font-size:12px; color:#fff; padding:4px 8px; border-radius:6px; border:none; display:none; }
-  .photo-item:hover .photo-date{ display:block; }
+  /* Hide per-photo date badge completely - removed hover display */
+  .photo-date{ display:none !important; }
   
   /* Photo Select Checkbox (Left side) */
   .photo-select{ 
     position:absolute; 
     top:8px; 
     left:8px; 
-    width:32px; 
-    height:32px; 
+    width:29px; 
+    height:29px; 
+    padding: 5px;
     border-radius:16px; 
     background:#ffffff; 
     border:1px solid #e5e7ee; 
@@ -308,10 +308,39 @@
     z-index: 2;
   }
   
-  /* Photo Favorite (Right side) */
-  .photo-favorite{ position:absolute; top:8px; right:8px; width:32px; height:32px; border-radius:16px; background:#ffffff; border:1px solid #e5e7ee; display:flex; align-items:center; justify-content:center; color:#666; }
-  .photo-favorite:hover{ background:#eef2ff; color:#1a73e8; }
-  .photo-favorite.active{ background:#1a73e8; color:#fff; border-color:#1a73e8; }
+  /* Photo Favorite (Bottom-left corner) */
+  .photo-favorite{ 
+    position:absolute; 
+    bottom:8px;  /* Changed from top to bottom */
+    left:8px;    /* Changed from right to left */
+    width:29px; 
+    height:29px; 
+    border-radius:16px; 
+    background:#ffffff; 
+    border:1px solid #e5e7ee; 
+    display:flex; 
+    align-items:center; 
+    justify-content:center; 
+    color:#666;
+    cursor:pointer;
+    transition: all 0.2s;
+    opacity: 0;
+    z-index: 3;
+  }
+  .photo-item:hover .photo-favorite {
+    opacity: 1;
+  }
+  .photo-favorite:hover{ background:#fce8ef; color:#e91e63; }
+  .photo-favorite.active{ 
+    background:#e91e63;  /* Pink background when active */
+    color:#fff; 
+    border-color:#e91e63;
+    opacity: 1;  /* Always visible when active */
+  }
+  /* When selection mode is active, keep favorite button visible for favorited items */
+  .has-selection-toolbar .photo-favorite.active { 
+    opacity: 1; 
+  }
 
       /* Empty State */
       .empty-state {

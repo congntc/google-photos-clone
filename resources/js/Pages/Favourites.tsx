@@ -68,6 +68,28 @@ export default function Favourites({ photos: initialPhotos = [], auth }: Favouri
   useEffect(() => {
     ensureIconCss();
   }, []);
+
+  // Reset body overflow when component mounts (fix scrollbar issue when navigating from other pages)
+  useEffect(() => {
+    // Add class to body to enable CSS override
+    document.body.classList.add('favourites-page-body');
+    
+    // Set overflow hidden for body/html (container will handle scroll)
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.height = '100%';
+    document.body.style.height = '100%';
+    
+    return () => {
+      // Remove class on unmount
+      document.body.classList.remove('favourites-page-body');
+      // Reset overflow to auto for other pages
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+      document.documentElement.style.height = '';
+      document.body.style.height = '';
+    };
+  }, []);
   
   const [photos, setPhotos] = useState<PhotoItem[]>(initialPhotos);
   const [videoDurations, setVideoDurations] = useState<Record<number, number>>({});
@@ -214,6 +236,7 @@ export default function Favourites({ photos: initialPhotos = [], auth }: Favouri
       const photoIndex = photos.findIndex(photo => photo.id === p.id);
       out.push(
         <div key={p.id} className="photo-item" onClick={(e: any) => {
+           if ((e.target as HTMLElement).closest('.photo-favorite')) return; // ignore favorite click
           if ((e.target as HTMLElement).closest('.photo-select')) return;
           setCurrentPhotoIndex(photoIndex);
           setZoomLevel(100);
@@ -253,6 +276,9 @@ export default function Favourites({ photos: initialPhotos = [], auth }: Favouri
             <div className="photo-date">{p.date}</div>
             <button type="button" className={`photo-select${selectedIds.has(p.id) ? ' active' : ''}`} onClick={() => onToggleSelect(p.id)} aria-label="Toggle select">
               <i className="las la-check" />
+            </button>
+            <button type="button" className={`photo-favorite${favoriteIds.has(p.id) ? ' active' : ''}`} onClick={() => onToggleFavorite(p.id)} aria-label="Toggle favorite">
+              <i className="las la-heart" />
             </button>
           </div>
         </div>

@@ -19,6 +19,23 @@ interface Props extends PageProps {
 }
 
 export default function AlbumCreateSelect({ title: initialTitle = '', photos: initialPhotos = [] }: Props) {
+  // Reset body overflow when component mounts (fix scrollbar issue when navigating from other pages)
+  useEffect(() => {
+    // Add class to body to enable CSS override
+    document.body.classList.add('album-create-select-page-body');
+    
+    // Force reset overflow on both html and body
+    document.documentElement.style.overflow = 'auto';
+    document.body.style.overflow = 'auto';
+    document.documentElement.style.height = 'auto';
+    document.body.style.height = 'auto';
+    
+    return () => {
+      // Remove class on unmount
+      document.body.classList.remove('album-create-select-page-body');
+    };
+  }, []);
+
   const [title, setTitle] = useState(initialTitle);
   const [photos, setPhotos] = useState<PhotoItem[]>(initialPhotos);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());

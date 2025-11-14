@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback } from 'react';
+import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { PageProps } from '@/types';
 import { router } from '@inertiajs/react';
 
@@ -7,6 +7,23 @@ interface AlbumCreateProps extends PageProps {
 }
 
 export default function AlbumCreate({ title: initialTitle = '', auth }: AlbumCreateProps) {
+  // Reset body overflow when component mounts (fix scrollbar issue when navigating from other pages)
+  useEffect(() => {
+    // Add class to body to enable CSS override
+    document.body.classList.add('album-create-page-body');
+    
+    // Force reset overflow on both html and body
+    document.documentElement.style.overflow = 'auto';
+    document.body.style.overflow = 'auto';
+    document.documentElement.style.height = 'auto';
+    document.body.style.height = 'auto';
+    
+    return () => {
+      // Remove class on unmount
+      document.body.classList.remove('album-create-page-body');
+    };
+  }, []);
+
   const [newTitle, setNewTitle] = useState(initialTitle);
   const fileRef = useRef<HTMLInputElement | null>(null);
 

@@ -136,8 +136,13 @@ export default function AppLayout({ children }: AppLayoutProps) {
         {showUserMenu && (
           <div className="create-dropdown-menu show" style={{ right: '10px', left: 'auto', top: '60px' }} ref={userMenuRef}>
             <div style={{ padding: '16px', borderBottom: '1px solid #e0e0e0' }}>
-              <div style={{ fontWeight: 600, marginBottom: '4px' }}>{auth?.user?.name}</div>
-              <div style={{ fontSize: '14px', color: '#5f6368' }}>{auth?.user?.email}</div>
+              <div className="">
+                 <div className="navbar-avatar" style={{ width: 40, height: 40, fontSize: 20, marginBottom: 8 }}>
+                  {auth?.user?.name?.charAt(0).toUpperCase() || 'P'}
+                </div>
+                <div style={{ fontWeight: 600, marginBottom: '4px' }}>{auth?.user?.name}</div>
+                <div style={{ fontSize: '14px', color: '#5f6368' }}>{auth?.user?.email}</div>
+              </div>
             </div>
             <ul className="dropdown-list">
               <li>
@@ -243,7 +248,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           <div className="sidebar-section-title">Bộ sưu tập</div>
           <li><Link href="/albums" className={url === '/albums' ? 'active' : ''}><i className="las la-book" /><span className="left-sidebar-title">Album</span></Link></li>
           <li><Link href="/documents" className={url === '/documents' ? 'active' : ''}><i className="las la-file-alt" /><span className="left-sidebar-title">Tài liệu</span></Link></li>
-          <li><Link href="/screenshots" className={url === '/screenshots' ? 'active' : ''}><i className="las la-mobile" /><span className="left-sidebar-title">Ảnh chụp màn hình</span></Link></li>
+          {/* <li><Link href="/screenshots" className={url === '/screenshots' ? 'active' : ''}><i className="las la-mobile" /><span className="left-sidebar-title">Ảnh chụp màn hình</span></Link></li> */}
           <li><Link href="/favourites" className={url === '/favourites' ? 'active' : ''}><i className="lar la-star" /><span className="left-sidebar-title">Ảnh yêu thích</span></Link></li>
           <li><Link href="/friends" className={url === '/friends' ? 'active' : ''}><i className="las la-user-friends" /><span className="left-sidebar-title">Bạn bè</span></Link></li>
           {/* <li><Link href="/people" className={url === '/people' ? 'active' : ''}><i className="las la-user-friends" /><span className="left-sidebar-title">Người và thú cưng</span></Link></li> */}
@@ -251,7 +256,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           <li><Link href="/videos" className={url === '/videos' ? 'active' : ''}><i className="las la-video" /><span className="left-sidebar-title">Video</span></Link></li>
           {/* <li><Link href="/recent" className={url === '/recent' ? 'active' : ''}><i className="las la-history" /><span className="left-sidebar-title">Mới thêm gần đây</span></Link></li> */}
           <li><Link href="/archive" className={url === '/archive' ? 'active' : ''}><i className="las la-archive" /><span className="left-sidebar-title">Kho lưu trữ</span></Link></li>
-          <li><Link href="/secure" className={url === '/secure' ? 'active' : ''}><i className="las la-shield-alt" /><span className="left-sidebar-title">Thư mục bảo mật</span></Link></li>
+          {/* <li><Link href="/secure" className={url === '/secure' ? 'active' : ''}><i className="las la-shield-alt" /><span className="left-sidebar-title">Thư mục bảo mật</span></Link></li> */}
           <li><Link href="/bin" className={url === '/bin' ? 'active' : ''}><i className="las la-trash-alt" /><span className="left-sidebar-title">Thùng rác</span></Link></li>
           <div className="sidebar-section-title">Bộ nhớ</div>
           <div className="sidebar-storage">
